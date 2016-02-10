@@ -6,6 +6,8 @@
         'nextWeekButtonId'  :'nextWeekButton',
         'prevMonthButtonId'  :'prevMonthButton',
         'nextMonthButtonId'  :'nextMonthButton',
+        'moveUpButtonId'  :'moveUpButton',
+        'moveDownButtonId'  :'moveDownButton',
         'daysOfWeekId'  :'daysOfWeek',
         'eventDisplayId' :'eventDisplay',
         'timeDisplayId' :'timeDisplay',
