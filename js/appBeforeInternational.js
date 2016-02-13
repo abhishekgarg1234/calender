@@ -3,12 +3,6 @@
         var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         var months=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
         var dates=[''];
-        var dd;
-        var setCountry="india";
-
-        var timeZoneCountries=["america","india"];
-        var timeZoneOffsets=["+3.5","+5.5"];
-
         var nextWeekButtonId, prevWeekButtonid, daysOfWeekId, currentMonthId, datesId,timeDisplayId, eventDisplayId,currentYearId,moveUpButtonId,moveDownButtonId,nextMonthButtonId,prevMonthButtonId;
 
         var setNextWeekButtonId = function(nextWeekButtonIdPar){
@@ -93,26 +87,6 @@
         };
 
         var createDates=function(dateNumber){
-
-            // if(setCountry!="india"){
-
-            //     var tempi=0;
-            //     for(var key in timeZoneCountries){
-            //         if(timeZoneCountries[key]==setCountry){
-            //             tempOffset=parseFloat(timeZoneOffsets[tempi]) - 5.5;
-            //             break;
-            //         }
-            //         else{
-            //             tempi++;
-            //         }
-            //     }
-            //     var tempOffset=tempOffset*60*60*1000;
-
-
-
-            //     dateNumber=dateNumber+tempOffset;
-            // }
-
             var d=new Date(dateNumber);
             var date=d.getDate();
             var day=d.getDay();
@@ -199,76 +173,28 @@
             return check;
         };
 
-        var ifPresentFromTime=function(frTime,edTime){
-            var check=0;
-            var x=JSON.parse(localStorage.getItem("calenderEvents"));
-            for(var key in x.data){
-                // if(x.data[key].frTime==frTime){
-                if( (frTime>=x.data[key].frTime && frTime<x.data[key].edTime) || (edTime>x.data[key].frTime && edTime<x.data[key].edTime)  ){
-                // if(){
-                    console.log(frTime+"-"+x.data[key].frTime+"-"+x.data[key].edTime);
-                    check=x.data[key].value;
-                //}
-                }
-            }
-            
-            return check;
-        }
-
-        var createEventBoxesColumn=function(columnDate,country){
-
-            var tempi=0;
-            for(var key in timeZoneCountries){
-                if(timeZoneCountries[key]==country){
-                    tempOffset=parseFloat(timeZoneOffsets[tempi]) - 5.5;
-                    break;
-                }
-                else{
-                    tempi++;
-                }
-            }
-            var tempOffset=tempOffset*60*60*1000;
-
-            var ndd=new Date(Number(dd));
-            var year=ndd.getFullYear();
-            var month=ndd.getMonth();
-            var date=ndd.getDate();
-                
-
-            var tempDate = new Date(year, month, columnDate);
-            var tempDateTime=Number(tempDate);
-            var gap=60;
+        var createEventBoxesColumn=function(columnDate){
+            var year=$("#currentYear").html();
+            var month=months.indexOf($("#currentMonth").html());
+            var date=$("#timeDisplay").children();
 
             var fr=document.createDocumentFragment();
             //for(var i=0;i<boxesInOneColumn;++){
             for(var i=0;i<24;i++){
                 var checkPresence=0;
                 var sp; var spEdit;
-
-                // var eventId=columnDate+"-"+month+"-"+year+"-"+i+offset+"hrs";
-
                 var eventId=columnDate+"-"+month+"-"+year+"-"+i+"hrs";
 
                 var eventContainer          =  document.createElement('div');
-                                  
+                              
                 eventContainer.setAttribute("id",eventId);
                 eventContainer.className    =  'event';
 
-                var frTime=tempDateTime;
-                var edTime=tempDateTime+(gap*60000);
-                tempDateTime=tempDateTime+(gap*60000);
-                eventContainer.setAttribute("from-time",frTime);
-                eventContainer.setAttribute("end-time",edTime);
-
                 var eventContainerEle       =  document.createElement('strong');
                 eventContainerEle.setAttribute("contenteditable","true");
-
-                //var value=ifPresent(eventId);
-                var value=ifPresentFromTime(frTime+tempOffset,edTime+tempOffset);
-                // console.log(frTime);
+                
+                var value=ifPresent(eventId);
                 if(value){
-                    var trtr=edTime+tempOffset;
-                    console.log(frTime+tempOffset+"-"+trtr);
                     eventContainerEle.innerHTML =  value;
                     eventContainerEle.setAttribute("class","textOfEvent");
                     eventContainerEle.setAttribute("id","te"+eventId);
@@ -281,120 +207,22 @@
                     checkPresence=1;
 
                     eventContainer.setAttribute("style","background-color:LightSteelBlue");
-                    }
-                    else{
-                        eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
-                        eventContainerEle.className="blankTextOfEvent";
-                        eventContainerEle.innerHTML =  "";
-                        eventContainerEle.setAttribute("id","te"+eventId);
-                    }
-                    
-                    eventContainer.appendChild(eventContainerEle);
-                    if(checkPresence==1){
-                        //eventContainer.appendChild(spEdit);
-                        eventContainer.appendChild(sp);
-                    }
-                    fr.appendChild(eventContainer);
                 }
-                return fr;
-        };
-
-        var createEventBoxesColumn2=function(columnDate){
-
-             //new part
-             ///*
-                var eventIdInUtcFormatSec=Number(dd)/1000;
-                var tttt=new Date((eventIdInUtcFormatSec*1000));
-
-                /*  
-                var year=(eventIdInUtcFormatSec*1000).getFullYear();
-                var month=(eventIdInUtcFormatSec*1000).getMonth();
-                var date=(eventIdInUtcFormatSec*1000).getDate();
-                */
-
-                var ndd=new Date(Number(dd));
-                var year=ndd.getFullYear();
-                var month=ndd.getMonth();
-                var date=ndd.getDate();
-
-
-                // var year=$("#currentYear").html();
-                // var month=months.indexOf($("#currentMonth").html());
-                // var date=$("#timeDisplay").children();
-                var tempDate = new Date(year, month, date,0,0,0);
-                var tempDateTime=Number(tempDate);
-                var gap=60;
-
-                var fr=document.createDocumentFragment();
-
-                for(var i=0;i<boxesInOneColumn;i++){
-
-                    
-
-
-                    var checkPresence=0;
-                    var sp; var spEdit;
-
-                    // var eventId=columnDate+"-"+month+"-"+year+"-"+i+offset+"hrs";
-
-                    var eventId=columnDate+"-"+month+"-"+year+"-"+i+"hrs";
-
-                    var eventContainer          =  document.createElement('div');
-                                  
-                    eventContainer.setAttribute("id",eventId);
-                    eventContainer.className    =  'event';
-
-                    var frTime=tempDateTime;
-                    var edTime=tempDateTime+(gap*6000);
-                    eventContainer.setAttribute("from-time",frTime);
-                    eventContainer.setAttribute("end-time",edTime);
-
-                    var eventContainerEle       =  document.createElement('strong');
-                    eventContainerEle.setAttribute("contenteditable","true");
-                    // var i1;
-                    // if(offset==5.5){
-                    //     i1=i;
-
-                    // }
-                    // else{
-                    //      i1=i-offset;
-                    // }
-                    
-                    // var eventIdNew=columnDate+"-"+month+"-"+year+"-"+i1+"hrs";
-                    // console.log(offset);
-                    // var value=ifPresent(eventIdNew);
-                    
-
-                    var value=ifPresent(eventId);
-                    if(value){
-                        eventContainerEle.innerHTML =  value;
-                        eventContainerEle.setAttribute("class","textOfEvent");
-                        eventContainerEle.setAttribute("id","te"+eventId);
-
-
-                        sp=document.createElement("span");
-                        sp.innerHTML="&#x2718;";
-                        sp.setAttribute("class","cross");
-                        sp.setAttribute("id",eventId);
-                        checkPresence=1;
-
-                        eventContainer.setAttribute("style","background-color:LightSteelBlue");
-                    }
-                    else{
-                        eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
-                        eventContainerEle.className="blankTextOfEvent";
-                        eventContainerEle.innerHTML =  "";
-                        eventContainerEle.setAttribute("id","te"+eventId);
-                    }
-                    
-                    eventContainer.appendChild(eventContainerEle);
-                    if(checkPresence==1){
-                        //eventContainer.appendChild(spEdit);
-                        eventContainer.appendChild(sp);
-                    }
-                    fr.appendChild(eventContainer);
+                else{
+                    eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
+                    eventContainerEle.className="blankTextOfEvent";
+                    eventContainerEle.innerHTML =  "";
+                    eventContainerEle.setAttribute("id","te"+eventId);
                 }
-                return fr;
+                
+                eventContainer.appendChild(eventContainerEle);
+                if(checkPresence==1){
+                    //eventContainer.appendChild(spEdit);
+                    eventContainer.appendChild(sp);
+                }
+                fr.appendChild(eventContainer);
+            }
+            return fr;
         };
 
         var createTimeBoxes=function(interval){
@@ -442,6 +270,7 @@
             }
             return fr;
         };
+
 
         var getTimeDisplay=function(){
 
@@ -544,27 +373,25 @@
             return fr;
         };
 
-        var calcTime=function(country) {
-            console.log(country);
-            var tempi=0;
-            for(var key in timeZoneCountries){
-                if(timeZoneCountries[key]==country){
-                    offset=parseFloat(timeZoneOffsets[tempi]);
-                    break;
-                }
-                else{
-                    tempi++;
-                }
-            }
+        var  calcTime=function(city, offset) {
 
+            // create Date object for current location
             d = new Date();
 
-            var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+            // convert to msec
+            // add local time zone offset
+            // get UTC time in msec
+            utc = d.getTime() + (d.getTimezoneOffset() * 60000);
 
-            var nd = new Date(utc + (3600000*offset));
+            // create new Date object for different city
+            // using supplied offset
+            nd = new Date(utc + (3600000*offset));
 
+            // return time as a string
+            //return "The local time in " + city + " is " + nd.toLocaleString();
 
             return Number(nd);
+
         }
         //calcTime("california",12*60);
        
@@ -584,23 +411,25 @@
             var eventDisplayInstance     =   document.getElementById(eventDisplayId);
             var datesInstance            =   document.getElementById(datesId);
 
-            // var dd=new Date();
-             dd=calcTime("india");
-             console.log(dd);
+            $("#top").hide();
+            $("#top2").hide();
+            var dd=new Date();
+            // var dd=calcTime("america",-245);
+            // var xxx=new Date(dd);
+            // console.log(xxx.toLocaleString());
 
             daysOfWeekInstance.appendChild(createDaysOfWeeks());
             // datesInstance.insertBefore(createDates(Number(dd)),datesInstance.childNodes[0]);
             datesInstance.appendChild(createDates(Number(dd)));
             currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
-            currentYearValue.innerHTML=changeCurrentYear(Number(dd));
+            currentYearValue.innerHTML=changeCurrentYear(Number(dd));            
             //passing interval as a argument in function to create time boxes
             timeDisplayInstance.appendChild(createTimeBoxes(60));
 
             for(var i=0;i<7;i++){
                 var columnDate=document.getElementById("dates").children[i].innerHTML;
                 // eventDisplayInstance.insertBefore(createEventBoxesColumn(columnDate),eventDisplayInstance.childNodes[0]);
-                eventDisplayInstance.appendChild(createEventBoxesColumn(columnDate,setCountry));
-
+                eventDisplayInstance.appendChild(createEventBoxesColumn(columnDate));
             }
 
             addEvent('click',prevWeekButtonInstance,function(e){
@@ -665,38 +494,11 @@
                 var r=confirm("Are you sure you want to delete");
                 if(r==true){
                     var id1=e.target.id;
-                    // console.log(id1);
-                    var frTime=$("#"+id1).attr("from-Time");
-
-
-                    if(setCountry!="india"){
-                        var tempOffset;
-                        var tempi=0;
-                        for(var key in timeZoneCountries){
-                            if(timeZoneCountries[key]==setCountry){
-                                tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
-                                // console.log(tempOffset);
-                                break;
-                            }
-                            else{
-                                tempi++;
-                            }
-                        }
-
-                        tempOffset=tempOffset*60*60*1000;
-                        console.log(tempOffset);
-
-
-                        frTime=frTime-tempOffset;
-                    }
-
-
                     $("#"+id1).css("background-image","url('images/plus2.jpg')");
                     var x=JSON.parse(localStorage.getItem("calenderEvents"));
                     var ij=0;
                     for(var key in x.data){                        
-                        // if(x.data[key].id==id1){
-                        if(x.data[key].frTime==frTime){
+                        if(x.data[key].id==id1){
                             x.data.splice(ij,1);
                             localStorage.setItem("calenderEvents",JSON.stringify(x));
                             document.getElementById(id1).children[0].innerHTML="";
@@ -737,38 +539,9 @@
                 var id=id1[1];
                 if(text != ""){
                     $("#"+id).css("background-image","");
-                    var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                    var x=JSON.parse(localStorage.getItem("calenderEvents"));                      
                     var endTime="";
-
-                    var frTime=$("#"+id).attr("from-Time");
-                    var edTime=$("#"+id).attr("end-Time");
-
-                    if(setCountry!="india"){
-
-
-                        var tempOffset;
-                        var tempi=0;
-                        for(var key in timeZoneCountries){
-                            if(timeZoneCountries[key]==setCountry){
-                                tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
-                                // console.log(tempOffset);
-                                break;
-                            }
-                            else{
-                                tempi++;
-                            }
-                        }
-
-                        tempOffset=tempOffset*60*60*1000;
-                        console.log(tempOffset);
-
-
-                        frTime=frTime-tempOffset;
-                        edTime=edTime-tempOffset;
-                    }
-
-                    var string='{ "id":"'+id+'" , "value":"'+text+'" , "duration":"'+endTime+'" , "frTime":"'+frTime+'" , "edTime":"'+edTime+'"}';
-                    console.log(frTime+"-"+edTime);
+                    var string='{ "id":"'+id+'","value":"'+text+'","duration":"'+endTime+'"}';
                     x.data.push(JSON.parse(string));
                     localStorage.setItem("calenderEvents",JSON.stringify(x));
 
@@ -861,52 +634,161 @@
             //displayCases();
             */
 
-            function displayCases(caseNumber){
-                console.log(caseNumber);
-                var boxesInOneColomn=24;
-                var totalBoxes=24*7;
-                var startDisplay=6*(caseNumber);
-                var tt=$("#eventDisplay").children();
-                for(i=0;i<totalBoxes;i++){
-                    
-                    if( i>=(startDisplay+(boxesInOneColomn*0)) && i<=(startDisplay+(boxesInOneColomn*0)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*1)) && i<=(startDisplay+(boxesInOneColomn*1)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*2)) && i<=(startDisplay+(boxesInOneColomn*2)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*3)) && i<=(startDisplay+(boxesInOneColomn*3)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*4)) && i<=(startDisplay+(boxesInOneColomn*4)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*5)) && i<=(startDisplay+(boxesInOneColomn*5)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColomn*6)) && i<=(startDisplay+(boxesInOneColomn*6)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else{
-                        $(tt[i]).removeClass("eventShow").addClass("eventHide");
-                    }
-                }
 
-                var tt2=$("#timeDisplay").children();
-                for(i=0;i<boxesInOneColomn;i++){
-                    if(i>=startDisplay && i<=startDisplay+5){
-                        $(tt2[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else{
-                        $(tt2[i]).removeClass("eventShow").addClass("eventHide");
-                    }
-
-                }
+            function displayCase0(){
+                        for(i=0;i<168;i++){
+                            var tt=$("#eventDisplay").children();
+                            if(i>=0 && i<=5){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=24 && i<=29){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=48 && i<=53){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=72 && i<=77){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=96 && i<=101){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=120 && i<=125){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=144 && i<=149){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+                        for(i=0;i<24;i++){
+                            var tt=$("#timeDisplay").children();
+                            if(i>=0 && i<=5){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
             }
+            function displayCase1(){
 
+                        for(i=0;i<168;i++){
+                            var tt=$("#eventDisplay").children();
+                            if(i>=6 && i<=11){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=30 && i<=35){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=54 && i<=59){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=78 && i<=83){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=102 && i<=107){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=126 && i<=131){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=150 && i<=155){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+                        for(i=0;i<24;i++){
+                            var tt=$("#timeDisplay").children();
+                            if(i>=6 && i<=11){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+            }
+            function displayCase2(){
+    for(i=0;i<168;i++){
+                            var tt=$("#eventDisplay").children();
+                            if(i>=12 && i<=17){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=36 && i<=41){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=60 && i<=65){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=84 && i<=89){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=108 && i<=113){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=132 && i<=137){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=156 && i<=161){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+                        for(i=0;i<24;i++){
+                            var tt=$("#timeDisplay").children();
+                            if(i>=12 && i<=17){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+            }
+            function displayCase3(){
+    
+                        for(i=0;i<168;i++){
+                            var tt=$("#eventDisplay").children();
+                            if(i>=18 && i<=23){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=42 && i<=47){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=66 && i<=71){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=90 && i<=95){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=114 && i<=119){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=138 && i<=143){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else if(i>=162 && i<=167){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+                        for(i=0;i<24;i++){
+                            var tt=$("#timeDisplay").children();
+                            if(i>=18 && i<=23){
+                                $(tt[i]).removeClass("eventHide").addClass("eventShow");
+                            }
+                            else{
+                                $(tt[i]).removeClass("eventShow").addClass("eventHide");
+                            }
+                        }
+            }
             function changeShowHide(){
                 $(".eventShow").show();
                 $(".eventHide").hide();
@@ -918,8 +800,25 @@
                 if(clickCount>3){
                     clickCount=3;
                 }
-                displayCases(clickCount);
-                changeShowHide();
+                switch(clickCount){
+                    case 0:
+                        displayCase0();
+                        changeShowHide();                            
+                        break;
+                    case 1:
+                        displayCase1();
+                        changeShowHide();
+                        break;
+                    case 2:
+                        displayCase2();
+                        changeShowHide();
+                        break;
+                    case 3:
+                        displayCase3();
+                        changeShowHide();
+                        break;
+                    default:
+                }
             });
 
             addEvent("click",moveUpButtonInstance,function(){
@@ -927,8 +826,25 @@
                 if(clickCount<0){
                     clickCount=0;
                 }
-                displayCases(clickCount);
-                changeShowHide();
+                switch(clickCount){
+                    case 0:
+                        displayCase0();
+                        changeShowHide();
+                        break;
+                    case 1:
+                        displayCase1();
+                        changeShowHide();
+                        break;
+                    case 2:
+                        displayCase2();
+                        changeShowHide();
+                        break;
+                    case 3:
+                        displayCase3();                       
+                        changeShowHide();
+                        break;
+                    default:
+                }
             });
             function temp(){
                 for(i=0;i<168;i++){
