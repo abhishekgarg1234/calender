@@ -4,10 +4,11 @@
         var months=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
         var dates=[''];
         var dd;
-        var setCountry="india";
+        var setCountry=$("#changeCountry").val();
+        // console.log(setCountry);
 
-        var timeZoneCountries=["america","india"];
-        var timeZoneOffsets=["+3.5","+5.5"];
+        var timeZoneCountries=["america", "india" ,"pakistan","srilanka", "iran" ,"iraq"];
+        var timeZoneOffsets  =["+6"   , "-5.5"  ,"-5"     ,"-5.5"     , "-3.5" ,"-3"];
 
         var nextWeekButtonId, prevWeekButtonid, daysOfWeekId, currentMonthId, datesId,timeDisplayId, eventDisplayId,currentYearId,moveUpButtonId,moveDownButtonId,nextMonthButtonId,prevMonthButtonId;
 
@@ -80,14 +81,20 @@
         };
 
         var createDaysOfWeeks=function(){
+            var tempi=0;
             var d=document.createDocumentFragment();
             for(var key in days){
                 var dayContainer            =  document.createElement('div');
                 dayContainer.className      = 'daysOfWeek';
+                if(tempi==6){
+                   dayContainer.className      = 'daysOfWeek sunday'; 
+                }
                 var dayContainerEle         = document.createElement('strong');
                 dayContainerEle.innerHTML   = days[key];
                 dayContainer.appendChild(dayContainerEle);
                 d.appendChild(dayContainer);
+                tempi++;
+
             }
            return d;
         };
@@ -131,6 +138,9 @@
 
                     var dateContainer=document.createElement("div");
                     dateContainer.className="dates";
+                    if(i==6){
+                        dateContainer.className="dates lastdate";
+                    }
                     // dateContainer.setAttribute("id","");
                     var textEle=document.createTextNode(startDate);
                     dateContainer.appendChild(textEle);
@@ -174,6 +184,12 @@
                 for(var i=0;i<7-difference;i++){
                      var dateContainer=document.createElement("div");
                      dateContainer.className="dates";
+
+                     if(i==(6-difference)){
+                        dateContainer.className="dates lastdate";
+                    }
+
+
                      // dateContainer.setAttribute("id","");
                      var textEle=document.createTextNode(startDate);
                      dateContainer.appendChild(textEle);
@@ -205,8 +221,9 @@
             for(var key in x.data){
                 // if(x.data[key].frTime==frTime){
                 if( (frTime>=x.data[key].frTime && frTime<x.data[key].edTime) || (edTime>x.data[key].frTime && edTime<x.data[key].edTime)  ){
+                // if(frTime==x.data[key].frTime || edTime==x.data[key].edTime){
                 // if(){
-                    console.log(frTime+"-"+x.data[key].frTime+"-"+x.data[key].edTime);
+                    // console.log(frTime+"-"+x.data[key].frTime+"-"+x.data[key].edTime);
                     check=x.data[key].value;
                 //}
                 }
@@ -233,22 +250,16 @@
             var year=ndd.getFullYear();
             var month=ndd.getMonth();
             var date=ndd.getDate();
-                
 
             var tempDate = new Date(year, month, columnDate);
             var tempDateTime=Number(tempDate);
             var gap=60;
 
             var fr=document.createDocumentFragment();
-            //for(var i=0;i<boxesInOneColumn;++){
             for(var i=0;i<24;i++){
                 var checkPresence=0;
                 var sp; var spEdit;
-
-                // var eventId=columnDate+"-"+month+"-"+year+"-"+i+offset+"hrs";
-
                 var eventId=columnDate+"-"+month+"-"+year+"-"+i+"hrs";
-
                 var eventContainer          =  document.createElement('div');
                                   
                 eventContainer.setAttribute("id",eventId);
@@ -265,14 +276,12 @@
 
                 //var value=ifPresent(eventId);
                 var value=ifPresentFromTime(frTime+tempOffset,edTime+tempOffset);
-                // console.log(frTime);
+
                 if(value){
-                    var trtr=edTime+tempOffset;
-                    console.log(frTime+tempOffset+"-"+trtr);
+                    console.log(value);
                     eventContainerEle.innerHTML =  value;
                     eventContainerEle.setAttribute("class","textOfEvent");
                     eventContainerEle.setAttribute("id","te"+eventId);
-
 
                     sp=document.createElement("span");
                     sp.innerHTML="&#x2718;";
@@ -281,115 +290,16 @@
                     checkPresence=1;
 
                     eventContainer.setAttribute("style","background-color:LightSteelBlue");
-                    }
-                    else{
-                        eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
-                        eventContainerEle.className="blankTextOfEvent";
-                        eventContainerEle.innerHTML =  "";
-                        eventContainerEle.setAttribute("id","te"+eventId);
-                    }
-                    
-                    eventContainer.appendChild(eventContainerEle);
-                    if(checkPresence==1){
-                        //eventContainer.appendChild(spEdit);
-                        eventContainer.appendChild(sp);
-                    }
-                    fr.appendChild(eventContainer);
                 }
-                return fr;
-        };
-
-        var createEventBoxesColumn2=function(columnDate){
-
-             //new part
-             ///*
-                var eventIdInUtcFormatSec=Number(dd)/1000;
-                var tttt=new Date((eventIdInUtcFormatSec*1000));
-
-                /*  
-                var year=(eventIdInUtcFormatSec*1000).getFullYear();
-                var month=(eventIdInUtcFormatSec*1000).getMonth();
-                var date=(eventIdInUtcFormatSec*1000).getDate();
-                */
-
-                var ndd=new Date(Number(dd));
-                var year=ndd.getFullYear();
-                var month=ndd.getMonth();
-                var date=ndd.getDate();
-
-
-                // var year=$("#currentYear").html();
-                // var month=months.indexOf($("#currentMonth").html());
-                // var date=$("#timeDisplay").children();
-                var tempDate = new Date(year, month, date,0,0,0);
-                var tempDateTime=Number(tempDate);
-                var gap=60;
-
-                var fr=document.createDocumentFragment();
-
-                for(var i=0;i<boxesInOneColumn;i++){
-
-                    
-
-
-                    var checkPresence=0;
-                    var sp; var spEdit;
-
-                    // var eventId=columnDate+"-"+month+"-"+year+"-"+i+offset+"hrs";
-
-                    var eventId=columnDate+"-"+month+"-"+year+"-"+i+"hrs";
-
-                    var eventContainer          =  document.createElement('div');
-                                  
-                    eventContainer.setAttribute("id",eventId);
-                    eventContainer.className    =  'event';
-
-                    var frTime=tempDateTime;
-                    var edTime=tempDateTime+(gap*6000);
-                    eventContainer.setAttribute("from-time",frTime);
-                    eventContainer.setAttribute("end-time",edTime);
-
-                    var eventContainerEle       =  document.createElement('strong');
-                    eventContainerEle.setAttribute("contenteditable","true");
-                    // var i1;
-                    // if(offset==5.5){
-                    //     i1=i;
-
-                    // }
-                    // else{
-                    //      i1=i-offset;
-                    // }
-                    
-                    // var eventIdNew=columnDate+"-"+month+"-"+year+"-"+i1+"hrs";
-                    // console.log(offset);
-                    // var value=ifPresent(eventIdNew);
-                    
-
-                    var value=ifPresent(eventId);
-                    if(value){
-                        eventContainerEle.innerHTML =  value;
-                        eventContainerEle.setAttribute("class","textOfEvent");
-                        eventContainerEle.setAttribute("id","te"+eventId);
-
-
-                        sp=document.createElement("span");
-                        sp.innerHTML="&#x2718;";
-                        sp.setAttribute("class","cross");
-                        sp.setAttribute("id",eventId);
-                        checkPresence=1;
-
-                        eventContainer.setAttribute("style","background-color:LightSteelBlue");
-                    }
-                    else{
+                else{
                         eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
                         eventContainerEle.className="blankTextOfEvent";
                         eventContainerEle.innerHTML =  "";
                         eventContainerEle.setAttribute("id","te"+eventId);
-                    }
-                    
+                }
+
                     eventContainer.appendChild(eventContainerEle);
                     if(checkPresence==1){
-                        //eventContainer.appendChild(spEdit);
                         eventContainer.appendChild(sp);
                     }
                     fr.appendChild(eventContainer);
@@ -398,6 +308,8 @@
         };
 
         var createTimeBoxes=function(interval){
+
+
             var diff=60/interval;
             var last=24*diff;
             var fr=document.createDocumentFragment();
@@ -545,7 +457,7 @@
         };
 
         var calcTime=function(country) {
-            console.log(country);
+            // console.log(country);
             var tempi=0;
             for(var key in timeZoneCountries){
                 if(timeZoneCountries[key]==country){
@@ -569,7 +481,8 @@
         //calcTime("california",12*60);
        
 
-        var bindForm    =   function(){
+        var bindForm    =   function(country){
+            setCountry=country;
 
             var prevWeekButtonInstance   =   document.getElementById(prevWeekButtonId);
             var nextWeekButtonInstance   =   document.getElementById(nextWeekButtonId);
@@ -585,22 +498,26 @@
             var datesInstance            =   document.getElementById(datesId);
 
             // var dd=new Date();
-             dd=calcTime("india");
-             console.log(dd);
+            dd=calcTime("india");
+
+            daysOfWeekInstance.innerHTML="";
 
             daysOfWeekInstance.appendChild(createDaysOfWeeks());
             // datesInstance.insertBefore(createDates(Number(dd)),datesInstance.childNodes[0]);
+            datesInstance.innerHTML="";
             datesInstance.appendChild(createDates(Number(dd)));
             currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
             currentYearValue.innerHTML=changeCurrentYear(Number(dd));
             //passing interval as a argument in function to create time boxes
+            timeDisplayInstance.innerHTML="";;
             timeDisplayInstance.appendChild(createTimeBoxes(60));
 
+
+            eventDisplayInstance.innerHTML="";
             for(var i=0;i<7;i++){
                 var columnDate=document.getElementById("dates").children[i].innerHTML;
                 // eventDisplayInstance.insertBefore(createEventBoxesColumn(columnDate),eventDisplayInstance.childNodes[0]);
                 eventDisplayInstance.appendChild(createEventBoxesColumn(columnDate,setCountry));
-
             }
 
             addEvent('click',prevWeekButtonInstance,function(e){
@@ -627,7 +544,6 @@
                 }
                 var ds=new Date(year,mon,1);
                 dd=Number(ds);
-               datesInstance.innerHTML="";
                displayChange(dd);
             }); 
 
@@ -641,36 +557,38 @@
                 }
                 var ds=new Date(year,mon,1);
                 dd=Number(ds);
-               datesInstance.innerHTML="";
                displayChange(dd);
             });
 
             function displayChange(dd){
+                console.log("dis");
                 datesInstance.innerHTML="";
                 datesInstance.appendChild(createDates(dd));
+
                 var newMonth=new Date(dd);
                 currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
                 currentYearValue.innerHTML  = changeCurrentYear(Number(dd));
                 eventDisplayInstance.innerHTML="";
                 for(var i=0;i<7;i++){
                 var xxx=document.getElementById("dates").children[i].innerHTML;
-                eventDisplayInstance.appendChild(createEventBoxesColumn(xxx));
-                
+                eventDisplayInstance.appendChild(createEventBoxesColumn(xxx,setCountry));
                 }
+
                 temp();
             }
 
             var handle2=function(e){
                 console.log("handle2");
                 var r=confirm("Are you sure you want to delete");
+                var tempOffset=0;
                 if(r==true){
                     var id1=e.target.id;
                     // console.log(id1);
                     var frTime=$("#"+id1).attr("from-Time");
+                    console.log(frTime);
 
-
-                    if(setCountry!="india"){
-                        var tempOffset;
+                    //if(setCountry!="india"){
+                        
                         var tempi=0;
                         for(var key in timeZoneCountries){
                             if(timeZoneCountries[key]==setCountry){
@@ -688,7 +606,10 @@
 
 
                         frTime=frTime-tempOffset;
-                    }
+                    //}
+
+                    var frTime1=$("#"+e.target.id).attr("from-time")-tempOffset;
+                var edTime1=$("#"+e.target.id).attr("end-time")-tempOffset;
 
 
                     $("#"+id1).css("background-image","url('images/plus2.jpg')");
@@ -696,20 +617,56 @@
                     var ij=0;
                     for(var key in x.data){                        
                         // if(x.data[key].id==id1){
-                        if(x.data[key].frTime==frTime){
-                            x.data.splice(ij,1);
-                            localStorage.setItem("calenderEvents",JSON.stringify(x));
-                            document.getElementById(id1).children[0].innerHTML="";
-                            document.getElementById(id1).children[0].setAttribute("class","blankTextOfEvent");
-                            var ch=document.getElementById(id1);
-                            ch.removeChild(ch.childNodes[1]);
-                            break;
-                        }
-                        else{
-                            ij++;
-                        }
-                    }
-                    $("#"+id1).css("background-color","");
+                        // if(x.data[key].frTime==frTime){
+                            if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+
+
+
+                                if(x.data[key].frTime !=frTime1){
+
+                                    if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
+                                        tempFrTime=parseInt($("#"+e.target.id).attr("from-time") )+parseInt((60*60*1000));
+                                        var x1="div[from-time='"+tempFrTime+"']";
+
+                                        var tt=$(x1).children();
+
+                                        $(tt[0]).html("");
+                                        $(tt[0]).attr("class","blankTextOfEvent");
+                                        $(tt[1]).remove();
+                                         $(x1).attr("style","background-image: url('images/plus2.jpg')");
+
+                                        
+                                        // $(x1).html("");
+                                        // $(x1).attr("class","blankTextOfEvent");
+                                    }
+                                    else{
+                                        tempFrTime=parseInt($("#"+e.target.id).attr("from-time") )-parseInt((60*60*1000));
+                                        var x1="div[from-time='"+tempFrTime+"']";
+
+                                        var tt=$(x1).children();
+
+                                        $(tt[0]).html("");
+                                        $(tt[0]).attr("class","blankTextOfEvent");
+                                        $(tt[1]).remove();
+                                        $(x1).attr("style","background-image: url('images/plus2.jpg')");
+
+                                        // $(x1).html("");
+                                        // $(x1).attr("class","blankTextOfEvent");
+                                    }
+                                }
+
+                                x.data.splice(ij,1);
+                                localStorage.setItem("calenderEvents",JSON.stringify(x));
+                                document.getElementById(id1).children[0].innerHTML="";
+                                document.getElementById(id1).children[0].setAttribute("class","blankTextOfEvent");
+                                var ch=document.getElementById(id1);
+                                ch.removeChild(ch.childNodes[1]);
+                                break;
+                            }
+                            else{
+                                ij++;
+                            }
+                    } 
                 }
                 else{
 
@@ -717,18 +674,137 @@
             };
             
             var handle4=function(e){
+                /*
+                var text=$("#"+e.target.id).text();
+                var tempOffset=0;
+                var id1=e.target.id;
+                var frTime=$("#"+id1).attr("from-Time");
+                    
+                var tempi=0;
+                for(var key in timeZoneCountries){
+                    if(timeZoneCountries[key]==setCountry){
+                        tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
+                        break;
+                    }
+                    else{
+                        tempi++;
+                    }
+                }
+                tempOffset=tempOffset*60*60*1000;
+                frTime=frTime-tempOffset;
+
+                var frTime1=$("#"+e.target.id).parent().attr("from-time")-tempOffset;
+                var edTime1=$("#"+e.target.id).parent().attr("end-time")-tempOffset;
+
+
+                $("#"+id1).css("background-image","url('images/plus2.jpg')");
+                var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                var ij=0;
+                for(var key in x.data){                        
+                    if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+                        if(x.data[key].frTime !=frTime1){
+                            if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
+                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )+parseInt((60*60*1000));
+                                var x1="div[from-time='"+tempFrTime+"']";
+                                var tt=$(x1).children();
+                                $(tt[0]).html(text);
+                            }
+                            else{
+                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )-parseInt((60*60*1000));
+                                var x1="div[from-time='"+tempFrTime+"']";
+                                var tt=$(x1).children();
+                                $(tt[0]).html(text);
+                            }
+                        }
+                        x.data[ij].value=text;
+                        localStorage.setItem("calenderEvents",JSON.stringify(x));
+                        break;
+                    }
+                    else{
+                        ij++;
+                    }
+                } 
+               
+                */
+
+
+                ///*
+                var text=$("#"+e.target.id).text();
+                var tempOffset=0;
+                var id1=e.target.id;
+                var frTime=$("#"+id1).parent().attr("from-Time");
+                // if(setCountry!="india"){
+                var tempi=0;
+                for(var key in timeZoneCountries){
+                    if(timeZoneCountries[key]==setCountry){
+                        tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
+                        break;
+                    }
+                    else{
+                        tempi++;
+                    }
+                }
+                tempOffset=tempOffset*60*60*1000;
+                frTime=frTime-tempOffset;
+
+                var frTime1=$("#"+e.target.id).parent().attr("from-time")-tempOffset;
+                var edTime1=$("#"+e.target.id).parent().attr("end-time")-tempOffset;
+                var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                var ij=0;
+                for(var key in x.data){
+                    // if(x.data[key].id==id1){
+                    // if(x.data[key].frTime==frTime){
+                    if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+                        if(x.data[key].frTime !=frTime1){
+
+                            if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
+                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )+parseInt((60*60*1000));
+                                var x1="div[from-time='"+tempFrTime+"']";
+                                var tempchild=$(x1).children();
+                                $(tempchild[0]).html(text);
+                                console.log("if");
+                            }
+                            else{
+                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )-parseInt((60*60*1000));
+                                var x1="div[from-time='"+tempFrTime+"']";
+                                var tempchild=$(x1).children();
+                                $(tempchild[0]).html(text);
+                                console.log("else");
+                            }
+                        }
+                        x.data[ij].value=text;
+                        localStorage.setItem("calenderEvents",JSON.stringify(x));
+                        // displayChange(dd);
+                        break;
+                    }
+                    else{
+                        ij++;
+                    }
+                }   
+
+
+                //*/
+
+
+
+
+                // $("#"+id1).css("background-color","");
+                // displayChange(dd);   
+
+                /*
                 console.log("handle4");
                 var text=$("#"+e.target.id).text();
                 var x=JSON.parse(localStorage.getItem("calenderEvents"));
                 var ttt=e.target.id.split("te");
                 var id=ttt[1];
                 for(var key in x.data){
-                            if(x.data[key].id==id){
-                                x.data[key].value=text;
-                            }
-                        }
+                    if(x.data[key].id==id){
+                        x.data[key].value=text;
+                    }
+                }
                 localStorage.setItem("calenderEvents",JSON.stringify(x));
-            }
+                */
+            };
 
             var handle5=function(e){
                 console.log("handle5");
@@ -743,9 +819,7 @@
                     var frTime=$("#"+id).attr("from-Time");
                     var edTime=$("#"+id).attr("end-Time");
 
-                    if(setCountry!="india"){
-
-
+                    // if(setCountry!="india"){
                         var tempOffset;
                         var tempi=0;
                         for(var key in timeZoneCountries){
@@ -765,7 +839,7 @@
 
                         frTime=frTime-tempOffset;
                         edTime=edTime-tempOffset;
-                    }
+                    // }
 
                     var string='{ "id":"'+id+'" , "value":"'+text+'" , "duration":"'+endTime+'" , "frTime":"'+frTime+'" , "edTime":"'+edTime+'"}';
                     console.log(frTime+"-"+edTime);
@@ -786,11 +860,64 @@
                 else{
                     $("#"+id).css("background-color","");
                 }
-            }
+            };
 
-            $('#'+eventDisplayId).on('click','.cross',handle2);
+            var handle6=function(e){
+
+                var tempi=0;
+                    for(var key in timeZoneCountries){
+                        if(timeZoneCountries[key]==setCountry){
+                            tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
+                            break;
+                        }
+                        else{
+                            tempi++;
+                        }
+                    }
+                var tempOffset=tempOffset*60*60*1000;
+
+
+
+                // console.log("handle6");
+                var frTime1=$("#"+e.target.id).parent().attr("from-time")-tempOffset;
+                var edTime1=$("#"+e.target.id).parent().attr("end-time")-tempOffset;
+                var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                
+                for(var key in x.data){
+                    if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+
+                        var datt1=parseInt(x.data[key].frTime)+parseInt(tempOffset);
+                        var dat1=new Date(parseInt(datt1));
+                        var hours1=dat1.getHours();
+                        var min1=dat1.getMinutes();
+
+                        var datt2=parseInt(x.data[key].edTime)+parseInt(tempOffset);
+                        var dat2=new Date(parseInt(datt2));
+
+                        // var dat2=new Date(parseInt(x.data[key].edTime));
+                        var hours2=dat2.getHours();
+                        var min2=dat2.getMinutes();
+                        var ans=hours1+":"+min1+"-"+hours2+":"+min2;
+                        $("#currEvent1").show();
+                        $("#currEvent2").show();
+                        $("#currEvent2").html(ans);
+                        break;
+                    }
+
+                }
+            };
+
+            var handle7=function(e){
+                 $("#currEvent1").hide();
+                        $("#currEvent2").hide();
+                        $("#currEvent2").html("");
+            };
+
+            $('#'+eventDisplayId).off().on('click','.cross',handle2);
             $('#'+eventDisplayId).on('blur' ,'.textOfEvent',handle4);
             $("#"+eventDisplayId).on('blur','.blankTextOfEvent',handle5);
+            $("#"+eventDisplayId).on('mouseenter','.textOfEvent',handle6);
+            $("#"+eventDisplayId).on('mouseleave','.textOfEvent',handle7);
 
             (function (){
                 $("#nextWeekButton").mouseenter(function(){
@@ -915,8 +1042,13 @@
 
             addEvent("click",moveDownButtonInstance,function(){
                 clickCount=clickCount+1;
-                if(clickCount>3){
+                if(clickCount>=3){
+                    $("#moveDownButton").css("cursor","not-allowed");
                     clickCount=3;
+                }
+                else{
+                    $("#moveDownButton").css("cursor","pointer");
+                    $("#moveUpButton").css("cursor","pointer");
                 }
                 displayCases(clickCount);
                 changeShowHide();
@@ -924,13 +1056,109 @@
 
             addEvent("click",moveUpButtonInstance,function(){
                 clickCount=clickCount-1;
-                if(clickCount<0){
+                if(clickCount<=0){
                     clickCount=0;
+                    $("#moveUpButton").css("cursor","not-allowed");
+                }
+                else{
+                    $("#moveUpButton").css("cursor","pointer");
+                    $("#moveDownButton").css("cursor","pointer");
                 }
                 displayCases(clickCount);
                 changeShowHide();
             });
+
+            $("#changeCountry").on("change",function(){
+                setCountry=this.value;
+
+
+                app.bindForm(setCountry);
+            });
+
+
+
+            function displaycasestemp(caseNumber){
+                var boxesInOneColomn=24;
+                var totalBoxes=24*7;
+                var startDisplay=6*(caseNumber);
+                var tt=$("#eventDisplay").children();
+                for(i=0;i<totalBoxes;i++){
+                    
+                    if( i>=(startDisplay+(boxesInOneColomn*0)) && i<=(startDisplay+(boxesInOneColomn*0)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*1)) && i<=(startDisplay+(boxesInOneColomn*1)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*2)) && i<=(startDisplay+(boxesInOneColomn*2)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*3)) && i<=(startDisplay+(boxesInOneColomn*3)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*4)) && i<=(startDisplay+(boxesInOneColomn*4)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*5)) && i<=(startDisplay+(boxesInOneColomn*5)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else if( i>=(startDisplay+(boxesInOneColomn*6)) && i<=(startDisplay+(boxesInOneColomn*6)+5) ){
+                        $(tt[i]).attr("class","event eventShow");
+                    }
+                    else{
+                        $(tt[i]).attr("class","event eventHide");
+                    }
+                }
+
+                var tt2=$("#timeDisplay").children();
+                for(i=0;i<boxesInOneColomn;i++){
+                    if(i>=startDisplay && i<=startDisplay+5){
+                        $(tt2[i]).attr("class","time eventShow");
+                    }
+                    else{
+                        $(tt2[i]).attr("class","time eventHide");
+                    }
+                }
+            }
+
             function temp(){
+                var tempi=0;
+                for(var key in timeZoneCountries){
+                    if(timeZoneCountries[key]==country){
+                        tempOffset=parseFloat(timeZoneOffsets[tempi]) - 5.5;
+                        break;
+                    }
+                    else{
+                        tempi++;
+                    }
+                }
+                var tempOffset=tempOffset*60*60*1000;
+
+                var tempdd=dd-tempOffset;
+                var tttt=new Date(tempdd);
+                var temphour=tttt.getHours();
+                if(temphour>=0 && temphour<6){
+                    // console.log("case0");
+                    clickCount=0;
+                    displaycasestemp(0);
+
+                }
+                else if(temphour>=6 && temphour<12){
+                    // console.log("case1");
+                    clickCount=1;
+                    displaycasestemp(1);
+                }
+                else if(temphour>=12 && temphour<18){
+                    // console.log("case2");
+                    clickCount=2;
+                    displaycasestemp(2);
+                }
+                else if(temphour>=18 && temphour<24){
+                    // console.log("case3");
+                    clickCount=3;
+                    displaycasestemp(3);
+                }
+                /*
                 for(i=0;i<168;i++){
                     var tt=$("#eventDisplay").children();
                     if(i>=0 && i<=5){
@@ -967,9 +1195,13 @@
                         $(tt[i]).attr("class","time eventHide");
                     }
                 }
+                */
                 changeShowHide();
             }
             temp();
+
+            $("#currEvent2").hide();
+            $("#currEvent1").hide();
         };
                 
         return {

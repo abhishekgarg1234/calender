@@ -6,14 +6,14 @@
 }
 .dates{
 	 height:25px;
-    width:103px;
+    width:104px;
     border-style: none;
     display: inline-block;
 }
 .time{
 	display: inline-block;
 	border-style: inset;
-	/*border-radius: 5px;*/
+	border-radius: 4px;
 	 height:60px;
     width:90px;
     border-width: 1px;
@@ -21,7 +21,7 @@
 }
 .daysOfWeek{
 	 height:25px;
-    width:103px;
+    width:105px;
     border-style: none;
     display: inline-block;
 }
@@ -35,18 +35,16 @@
     border-width:1px;	 
     display: inline-block;
     overflow-y: auto;
-
 }
 .year{
 	/*background-color: #33FFFF;*/
 	font-weight: bold;
+	display: inline-block;
 }
-
 .popover {
     border: 2px dotted red;
     width:500px;
 }
-
 .cross{
 	cursor: pointer;
 	color:red;
@@ -61,8 +59,8 @@
 .blankTextOfEvent{
 	padding-left: 3px;
 	outline:none;
+	background-image: url("images/plus2.jpg");
 }
-
 .daterow{
 	display: inline-block;
 }
@@ -88,7 +86,6 @@
 }
 #eventDate{
 	font-weight: bold;
-
 }
 #eventInputText{
 	outline: none;
@@ -98,7 +95,6 @@
     border-radius: 4px;
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
 }
-
 #mainBody{
 	min-width: 920px;
 	margin-top: 30px;
@@ -106,28 +102,25 @@
 #upperPart{
 	    /*margin-left: 96px;*/
 	    background-color: DarkSalmon;
-	    width:915px;
+	    width:805px;
 	    border-radius: 5px;
 	    border:solid;
 }
 #timeDisplay{
-	    position: absolute;
+	position: absolute;
     top: 0;
     left: 0;
-
 	width:90px;
 }
 #boxes{
 	position: relative;
 	height: 360px;
-
 }
 #eventDisplay{
 	position: absolute;
     top: 0;
     left: 90px;
     right: 0;
-	
 width:720px;
 -webkit-column-count: 7; /* Chrome, Safari, Opera */
     -moz-column-count: 7; /* Firefox */
@@ -136,28 +129,30 @@ width:720px;
     -moz-column-gap: 0px; /* Firefox */
     column-gap: 0px;
 }
-
 #currentMonth{
 	
 	width:100px;
 	font-weight: bold;
 }
-
 #month{
 	/*background-color: #33FFFF;*/
 	/*width: 87px;*/
-    margin-left: 270px;
+    margin-left: 260px;
 }
 #year{
-	    width: 35px;
-    margin-left: 400px;
+	    /*width: 35px;*/
+    /*margin-left: 400px;*/
+    /*display: inline-block;*/
 }
-
+#currentYear{
+	margin-left: 212px;
+}
 #daysOfWeek{
 	/*background-color: #33FFFF;*/
 }
 #days{
 	/*background-color: #33FFFF;*/
+	width:805px;
 }
 #dates{
 	/*background-color: #33FFFF;*/
@@ -171,29 +166,29 @@ width:720px;
 #nextMonthButton{
 	/*background-color: #33CCFF;*/
 	cursor: pointer;
-	width: 96px;
 	/*padding-left: 50px;*/
 }
-
 #prevWeekButton{
 	/*background-color: #33CCFF;*/
 	cursor: pointer;
 	width: 90px;
 }
-
 #nextWeekButton{
+	position:absolute;
+
+	left: 780px;
+    top: 73px;
 	/*background-color: #33CCFF;*/
 	cursor: pointer;
-	width: 96px;
+	width: 46px;
 }
-
 #endingTime{
 	/*border-right: 5px;*/
 	border: 2px solid #765942;
 	border-radius: 10px;
 }
 #moveUpButton{
-	width: 96px;
+	width: 100px;
 	/*height: 50px;*/
 	/*background-color: LightSteelBlue;*/
 	/*background-image: url("upsign.jpg");*/
@@ -208,4 +203,16 @@ width:720px;
 	padding-top: 10px;
 	cursor: pointer;
 	border-radius: 10px;
+}
+#changeCountry{
+	background-color: DarkSalmon;
+    border-radius: 10px;
+    border-width: 2px;
+    margin-left: 40px;
+}
+.sunday{
+	width:60px;
+}
+.lastdate{
+	width:60px;
 }

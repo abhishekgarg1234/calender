@@ -2,41 +2,26 @@
 	<head>
 		<title>Calender</title>
 		<link rel="stylesheet" href="css/calender.css">
-		<!--  -->
-		  <!-- <link rel="stylesheet" href="css/bootstrap.min.css">  -->
 		<script src="js/jquery.min.js"   > </script>
-		<script src="js/bootstrap.min.js"> </script>
 	</head>
 
 	<body bgcolor="#f5f5f5">
-	
-	<!--<div class="container">
-  <h3>Popover Example</h3>
-  <p>Popovers are not CSS-only plugins, and must therefore be initialized with jQuery: select the specified element and call the popover() method.</p>
-  <a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Toggle popover</a>
-</div>-->
-
-<!-- <div id="top">
-	<span class="x y" id="eventDate"></span><br>
-	<input type="text" id="eventInputText" autofocus><br> -->
-	<!-- <span id="upto">Upto</span> -->
-	<!-- <select id="endingTime"></select> -->
-
-
-
-	<!-- <button type="button" id="eventAdd">OK</button> -->
-<!-- 	<span id="eventAdd">Create</span>
-	<span id="deleteEvent">Delete</span> -->
-	<!-- <button type="button" id="deleteEvent">DELETE</button> -->
-<!-- </div> -->
-
 		<div id="mainBody">
-			<!-- <div id="temp"> -->
+			<!-- <div class="dayClass" id="nextWeekButton"><center>&#x276F;<c/enter></div> -->
 			<div id="upperPart">
 				<div id="year" >
-					<!-- <div class="month" id="prevButton">&#x276E;</div> -->
-					<div class="year" id="currentYear"></div>
-					<!-- <div class="month" id="nextButton">&#x276F;</div> -->
+					<div class="year">
+						<select  id="changeCountry">
+							<option value="india">India</option>
+							<option value="america">America(Chicago)</option>
+							<option value="pakistan">Pakistan</option>
+							<option value="srilanka">Srilanka</option>
+							<option value="iran">Iran</option>
+							<option value="iraq">Iraq</option>
+						</select>
+					</div>
+					<div class="year" id="currentYear">
+					</div>
 				</div >
 				<div id="month" >
 					<div class="month" id="prevMonthButton"><center>&#x276E;</center></div> 
@@ -46,19 +31,23 @@
 				<div id="days">
 					<div class="dayClass" id="prevWeekButton"><center>&#x276E;</center></div>
 					<div class="dayClass" id="daysOfWeek"></div>
-					<div class="dayClass" id="nextWeekButton"><center>&#x276F;<c/enter></div>
+					<div class="dayClass" id="nextWeekButton"><center>&#x276F;<center></div>
 				</div>
-				<div class="daterow" id="moveUpButton"><center>&#x21E7;</center></div>
+				<div class="daterow" id="moveUpButton"><center>&#x21E7;</center>
+				</div>
 				<div class="daterow" id="dates">
-					<!-- <div class="dates" id="moveUpButton"><center></center></div> -->
 				</div>
 			</div>
-			<!-- <div id="moveUpButton"><center></center></div> -->
 			<div id="boxes">
 				<div class="timeboxes" id="timeDisplay"></div>
 				<div class="eventboxes" id="eventDisplay"></div>
 			</div>
-			<div id="moveDownButton"><center>&#x21E9;</center></div>
+			<div id="moveDownButton"><center>&#x21E9;</center>
+			</div>
+		</div>
+		<div>
+			<p id="currEvent1">Current Event Time</p>
+			<p id="currEvent2"></p>
 		</div>
 		
 		<script type="text/javascript" src="js/config.js"></script>

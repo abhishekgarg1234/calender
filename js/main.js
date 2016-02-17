@@ -12,5 +12,5 @@
 	app.setEventDisplayId(config.eventDisplayId);
 	app.setDatesId(config.datesId);
 	app.setLocalStorage();
-    app.bindForm();
+    app.bindForm($("#changeCountry").val());
 })(window.config, window.app);
