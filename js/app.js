@@ -65,8 +65,6 @@
         };
 
 
-
-
         var convertUtcToThis=function(time1,country){
             var offset;
             var j=0;
@@ -884,7 +882,8 @@
             });
 
             addEvent('click',prevMonthButtonInstance,function(e){
-                var da=new Date(dd);
+                // var da=new Date(dd);
+                var da=new Date(currentUtcTime);
                 var year=da.getFullYear();
                 var mon=da.getMonth();
                 mon=mon-1;
@@ -893,12 +892,16 @@
                     mon=11;
                 }
                 var ds=new Date(year,mon,1);
-                dd=Number(ds);
-               displayChange(dd);
+                console.log(ds);
+                // dd=Number(ds);
+                currentUtcTime=Number(ds);
+               // displayChange(dd);
+               displayChange(currentUtcTime);
             }); 
 
             addEvent('click',nextMonthButtonInstance,function(e){
-                var da=new Date(dd);
+                // var da=new Date(dd);
+                var da=new Date(currentUtcTime);
                 var year=da.getFullYear();
                 var mon=da.getMonth();
                 mon=mon+1;
@@ -906,8 +909,10 @@
                     year=year+1;
                 }
                 var ds=new Date(year,mon,1);
-                dd=Number(ds);
-               displayChange(dd);
+                // dd=Number(ds);
+                currentUtcTime=Number(ds);
+               // displayChange(dd);
+               displayChange(currentUtcTime);
             });
 
             function displayChange(dd){
