@@ -3,15 +3,10 @@
         var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         var months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
         var dates = [''];
-        var dd;
+        var gap = 60;
         var currentCountryDate = new Date();
-
-
         var setCountry = $("#changeCountry").val();
-        // console.log(setCountry);
-
         var timeZoneCountries = ["america", "india", "pakistan", "srilanka", "iran", "iraq", "utc"];
-        // var timeZoneOffsets  =["+6"   , "-5.5"  ,"-5"     ,"-5.5"     , "-3.5" ,"-3"];
         var timeZoneOffsets = ["-6", "+5.5", "+5", "+5.5", "+3.5", "+3.2", "0"];
 
         var nextWeekButtonId, prevWeekButtonid, daysOfWeekId, currentMonthId, datesId, timeDisplayId, eventDisplayId, currentYearId, moveUpButtonId, moveDownButtonId, nextMonthButtonId, prevMonthButtonId;
@@ -95,7 +90,6 @@
             var y = parseInt(x.getTimezoneOffset());
             var ans = Number(x) + (60 * y);
             return ans;
-            // return x.getTime;
         };
 
         var setLocalStorage = function() {
@@ -105,7 +99,6 @@
         };
 
         var addEvent = function(evnt, elem, func) {
-
             if (elem.addEventListener) // W3C DOM
                 elem.addEventListener(evnt, func, false);
             else if (elem.attachEvent) { // IE DOM
@@ -129,102 +122,11 @@
                 dayContainer.appendChild(dayContainerEle);
                 d.appendChild(dayContainer);
                 tempi++;
-
             }
             return d;
         };
 
-        var createDates = function(dateNumber) {
-
-            // if(setCountry!="india"){
-            //     var tempi=0;
-            //     for(var key in timeZoneCountries){
-            //         if(timeZoneCountries[key]==setCountry){
-            //             tempOffset=parseFloat(timeZoneOffsets[tempi]) - 5.5;
-            //             break;
-            //         }
-            //         else{
-            //             tempi++;
-            //         }
-            //     }
-            //     var tempOffset=tempOffset*60*60*1000;
-            //     dateNumber=dateNumber+tempOffset;
-            // }
-
-            var d = new Date(dateNumber);
-            var date = d.getDate();
-            var day = d.getDay();
-            var year = d.getFullYear();
-            var month = d.getMonth();
-            var todayDate = new Date();
-            var fr = document.createDocumentFragment();
-            if (date >= day) {
-                var startDate = date - day + 1;
-                var temp = 0;
-                var st = startDate;
-                for (var i = 0; i < 7; i++) {
-
-                    var dateContainer = document.createElement("div");
-                    dateContainer.className = "dates";
-                    if (i == 6) {
-                        dateContainer.className = "dates lastdate";
-                    }
-                    // dateContainer.setAttribute("id","");
-                    var textEle = document.createTextNode(startDate);
-                    dateContainer.appendChild(textEle);
-                    if (todayDate.getDate() == st && todayDate.getMonth() == month && todayDate.getFullYear() == year) {
-                        dateContainer.setAttribute("style", "font-weight:bold");
-                    }
-
-                    if (temp == 0) {
-                        //dateContainer.setAttribute("style","font-weight:bold"); 
-                    } else {
-                        dateContainer.setAttribute("style", "opacity:0.6");
-                    }
-
-                    fr.appendChild(dateContainer);
-                    startDate++;
-                    var x2 = new Date(year, month + 1, 0).getDate();
-                    if (startDate > x2) {
-                        temp = 1;
-                        dateContainer.setAttribute("style", "opacity:0.6");
-                        startDate = 1;
-                    }
-                    st++;
-                }
-            } else {
-                var difference = day - date;
-                var x2 = new Date(year, month, 0).getDate();
-                var startDate2 = x2 - difference + 1;
-                for (var i = 0; i < difference; i++) {
-                    var dateContainer = document.createElement("div");
-                    dateContainer.className = "dates";
-                    // dateContainer.setAttribute("id","");
-                    var textEle = document.createTextNode(startDate2);
-                    dateContainer.setAttribute("style", "opacity:0.6");
-                    dateContainer.appendChild(textEle);
-                    fr.appendChild(dateContainer);
-                    startDate2++;
-                }
-                var startDate = 1;
-                for (var i = 0; i < 7 - difference; i++) {
-                    var dateContainer = document.createElement("div");
-                    dateContainer.className = "dates";
-                    if (i == (6 - difference)) {
-                        dateContainer.className = "dates lastdate";
-                    }
-                    // dateContainer.setAttribute("id","");
-                    var textEle = document.createTextNode(startDate);
-                    dateContainer.appendChild(textEle);
-                    //dateContainer.setAttribute("style","font-weight:bold");
-                    fr.appendChild(dateContainer);
-                    startDate++;
-                }
-            }
-            return fr;
-        };
-
-        var createDates2 = function(dateNumber, setCountry) {
+        var createDates = function(dateNumber, setCountry) {
             var adjustedTime = convertUtcToThis(dateNumber, setCountry);
             var d = new Date(adjustedTime);
             var date = d.getDate();
@@ -298,36 +200,6 @@
             return fr;
         };
 
-        var ifPresent = function(eid) {
-            var check = 0;
-            var x = JSON.parse(localStorage.getItem("calenderEvents"));
-            for (var key in x.data) {
-                if (x.data[key].id == eid) {
-                    check = x.data[key].value;
-                    if (check == "") {}
-                }
-            }
-
-            return check;
-        };
-
-        var ifPresentFromTime = function(frTime, edTime) {
-            var check = 0;
-            var x = JSON.parse(localStorage.getItem("calenderEvents"));
-            for (var key in x.data) {
-                // if(x.data[key].frTime==frTime){
-                if ((frTime >= x.data[key].frTime && frTime < x.data[key].edTime) || (edTime > x.data[key].frTime && edTime < x.data[key].edTime)) {
-                    // if(frTime==x.data[key].frTime || edTime==x.data[key].edTime){
-                    // if(){
-                    // console.log(frTime+"-"+x.data[key].frTime+"-"+x.data[key].edTime);
-                    check = x.data[key].value;
-                    //}
-                }
-            }
-
-            return check;
-        };
-
         var ifPresentEvent = function(frTime, edTime) {
             var check = 0;
             var x = JSON.parse(localStorage.getItem("calenderEvents"));
@@ -341,94 +213,15 @@
             return check;
         };
 
-        var createEventBoxesColumn = function(columnDate, country) {
-
-            var tempi = 0;
-            for (var key in timeZoneCountries) {
-                if (timeZoneCountries[key] == country) {
-                    tempOffset = parseFloat(timeZoneOffsets[tempi]) - 5.5;
-                    break;
-                } else {
-                    tempi++;
-                }
-            }
-            var tempOffset = tempOffset * 60 * 60 * 1000;
-
-            var ndd = new Date(Number(dd));
-            var year = ndd.getFullYear();
-            var month = ndd.getMonth();
-            var date = ndd.getDate();
-
-            var tempDate = new Date(year, month, columnDate);
-            var tempDateTime = Number(tempDate);
-            var gap = 20;
-
-            var fr = document.createDocumentFragment();
-            for (var i = 0; i < 24; i++) {
-                var checkPresence = 0;
-                var sp;
-                var spEdit;
-                var eventId = columnDate + "-" + month + "-" + year + "-" + i + "hrs";
-                var eventContainer = document.createElement('div');
-
-                eventContainer.setAttribute("id", eventId);
-                eventContainer.className = 'event';
-
-                var frTime = tempDateTime;
-                var edTime = tempDateTime + (gap * 60000);
-                tempDateTime = tempDateTime + (gap * 60000);
-                eventContainer.setAttribute("from-time", frTime);
-                eventContainer.setAttribute("end-time", edTime);
-
-                var eventContainerEle = document.createElement('strong');
-                eventContainerEle.setAttribute("contenteditable", "true");
-
-                //var value=ifPresent(eventId);
-                var value = ifPresentFromTime(frTime + tempOffset, edTime + tempOffset);
-
-                if (value) {
-                    eventContainerEle.innerHTML = value;
-                    eventContainerEle.setAttribute("class", "textOfEvent");
-                    eventContainerEle.setAttribute("id", "te" + eventId);
-
-                    sp = document.createElement("span");
-                    sp.innerHTML = "&#x2718;";
-                    sp.setAttribute("class", "cross");
-                    sp.setAttribute("id", eventId);
-                    checkPresence = 1;
-
-                    eventContainer.setAttribute("style", "background-color:LightSteelBlue");
-                } else {
-                    eventContainer.setAttribute("style", "background-image: url('images/plus2.jpg')");
-                    eventContainerEle.className = "blankTextOfEvent";
-                    eventContainerEle.innerHTML = "";
-                    eventContainerEle.setAttribute("id", "te" + eventId);
-                }
-
-                eventContainer.appendChild(eventContainerEle);
-                if (checkPresence == 1) {
-                    eventContainer.appendChild(sp);
-                }
-                fr.appendChild(eventContainer);
-            }
-            return fr;
-        };
-
-        var createEventBoxesColumn2 = function(dateNumber, columnDate, country) {
-            var gap = 20;
+        var createEventBoxesColumn = function(dateNumber, columnDate, country) {
             var boxesInOneColumn = parseInt(1440 / gap);
             var intervalInMilliSeconds = gap * 60 * 1000;
             var adjustedTime = convertUtcToThis(dateNumber, setCountry);
             var d1 = new Date(adjustedTime);
             var year = d1.getFullYear();
             var month = d1.getMonth();
-            // var currentCountryYear=currentCountryDate.getFullYear();
-            // var CurrentCountryMonth=currentCountryDate.getMonth();
-
-            // var tempDate = new Date(currentCountryYear, CurrentCountryMonth, columnDate);
             var tempDate = new Date(year, month, columnDate);
             var tempDateTime = Number(tempDate);
-            // console.log(tempDateTime);
             tempDateTime = parseInt(convertUtcToThis(tempDateTime, setCountry));
             var prevTempDateTime = tempDateTime;
 
@@ -436,7 +229,6 @@
                 var c = new Date(tempDateTime);
                 var str = c.toString();
                 var strArr = str.split(" ");
-
                 var timeText = strArr[4];
 
                 var c3 = new Date(prevTempDateTime);
@@ -444,22 +236,13 @@
                 var strArr3 = str3.split(" ");
                 var timeText3 = strArr3[4];
 
-                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
                 if ((parseInt(timeText) == 23 && parseInt(timeText3) == 0) || (parseInt(timeText) == 0 && parseInt(timeText3) == 23)) {
                     if (timeText3 == "00:00:00") {
-                        console.log("aaaa");
                         tempDateTime = parseInt(tempDateTime) + parseInt(intervalInMilliSeconds);
                     }
                     break;
                 }
-                // }
                 prevTempDateTime = tempDateTime;
-                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
-                // // if(parseInt(timeText)<0){
-
-                //     break;
-                // }
-                // tempDateTime=parseInt(tempDateTime)-parseInt((gap*60*1000));
                 var tempi = 0;
                 for (var key in timeZoneCountries) {
                     if (timeZoneCountries[key] == country) {
@@ -489,15 +272,11 @@
                 var edTime = parseInt(tempDateTime) + parseInt(intervalInMilliSeconds);
                 tempDateTime = tempDateTime + parseInt(intervalInMilliSeconds);
 
-                //this frtime is according to the country
                 eventContainer.setAttribute("from-time", frTime);
                 eventContainer.setAttribute("end-time", edTime);
 
                 var eventContainerEle = document.createElement('strong');
                 eventContainerEle.setAttribute("contenteditable", "true");
-
-                //var value=ifPresent(eventId);
-                // var value=ifPresentFromTime(frTime,edTime);
 
                 var value = ifPresentEvent(frTime, edTime);
 
@@ -527,51 +306,7 @@
             return fr;
         };
 
-        var createTimeBoxes = function(interval) {
-            var diff = 60 / interval;
-            var last = 24 * diff;
-            var fr = document.createDocumentFragment();
-            for (var i = 0; i < last; i++) {
-                var timeContainer = document.createElement("div");
-                timeContainer.className = "time";
-                var id1 = "time" + i;
-                timeContainer.setAttribute("id", id1);
-                var timeContainerEle = document.createElement("strong");
-                var timeText;
-                var ii1 = i;
-                if (ii1 < 12) {
-                    var j = ii1 + 1;
-                    if (ii1 == 0) {
-                        ii1 = 12;
-                    }
-                    if (j == 12) {
-                        timeText = ii1 + "am - " + j + "pm";
-                    } else {
-                        timeText = ii1 + "am - " + j + "am";
-                    }
-                } else {
-                    ii = ii1 - 12;
-                    var j = ii + 1;
-                    if (ii == 0) {
-                        ii = 12;
-                    }
-                    if (j == 12) {
-                        timeText = ii + "pm - " + j + "am";
-                    } else {
-                        timeText = ii + "pm - " + j + "pm";
-                    }
-                }
-
-                //timeContainerEle.innerHTML=i+"hrs";
-                timeContainerEle.innerHTML = timeText;
-                timeContainer.appendChild(timeContainerEle);
-                fr.appendChild(timeContainer);
-            }
-            return fr;
-        };
-
-        var createTimeBoxes2 = function(dateNumber, columnDate, country) {
-            var gap = 20;
+        var createTimeBoxes = function(dateNumber, columnDate, country) {
             var boxesInOneColumn = parseInt(1440 / gap);
             var adjustedTime = convertUtcToThis(dateNumber, setCountry);
             var d1 = new Date(adjustedTime);
@@ -582,7 +317,6 @@
             var tempDateTime = Number(tempDate);
             tempDateTime = parseInt(convertUtcToThis(tempDateTime, setCountry));
             var prevTempDateTime = tempDateTime;
-            // var c=new Date(tempDateTime);
             while (1) {
                 var c = new Date(tempDateTime);
                 var str = c.toString();
@@ -592,14 +326,12 @@
                 var str3 = c3.toString();
                 var strArr3 = str3.split(" ");
                 var timeText3 = strArr3[4];
-                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
                 if ((parseInt(timeText) == 23 && parseInt(timeText3) == 0) || (parseInt(timeText) == 0 && parseInt(timeText3) == 23)) {
                     if (timeText3 == "00:00:00") {
                         tempDateTime = parseInt(tempDateTime) + parseInt(intervalInMilliSeconds);
                     }
                     break;
                 }
-                // }
                 prevTempDateTime = tempDateTime;
                 var tempi = 0;
                 for (var key in timeZoneCountries) {
@@ -615,7 +347,6 @@
                     tempi++;
                 }
             }
-
             var fr = document.createDocumentFragment();
             for (var i = 0; i < boxesInOneColumn; i++) {
                 var c = new Date(tempDateTime);
@@ -624,90 +355,19 @@
                 var id1 = "time" + i;
                 timeContainer.setAttribute("id", id1);
                 var timeContainerEle = document.createElement("strong");
+
                 var str = c.toString();
                 var strArr = str.split(" ");
-
                 var timeText = strArr[4];
 
                 var c1 = new Date(tempDateTime + parseInt(intervalInMilliSeconds));
                 var str1 = c1.toString();
                 var strArr1 = str1.split(" ");
                 timeText = timeText + "-" + strArr1[4];
-
                 timeContainerEle.innerHTML = timeText;
                 timeContainer.appendChild(timeContainerEle);
                 fr.appendChild(timeContainer);
                 tempDateTime = parseInt(tempDateTime) + parseInt(intervalInMilliSeconds);
-            }
-            return fr;
-        };
-
-        var getTimeDisplay = function() {
-            var fr = document.createDocumentFragment();
-            var totalMinutes = 24 * 60;
-            var startTimeDisplay = 0;
-            var endTimeDisplay = startTimeDisplay + gap;
-            var st1 = 0;
-            var st2 = 0;
-
-            var mid = boxesInOneColumn / 2;
-
-            for (var i = 0; i < boxesInOneColumn; i++) {
-
-                var timeContainer = document.createElement("div");
-                timeContainer.className = "time";
-                var id1 = "time" + i;
-                timeContainer.setAttribute("id", id1);
-                var timeContainerEle = document.createElement("strong");
-                var timeText;
-
-                if (i < mid) {
-                    if (st2 == 60) {
-                        st1++;
-                        st2 = 0;
-                    }
-                    stTime = st1 + ":" + st2 + "am";
-
-
-                    if (st2 + gap == 60) {
-                        edTime = st1 + 1 + ":0am";
-                    } else {
-                        var st22 = st2 + gap;
-                        edTime = st1 + ":" + st22 + "am";
-                    }
-
-                    timeText = stTime + " - " + edTime;
-                    st2 = st2 + gap;
-                } else {}
-
-
-                /*
-                var tempi=i;
-                if(tempi<mid){
-                    if(intervalGap>1){
-                        stTime=;
-                    }
-                    else{
-                        stTime=;
-                    }
-                    stTime=;
-                    edTime=;
-                    timeText=stTime+" - "+edTime;
-
-                    timeText=x+":"+y+"am - "+j+":"+z+"am";
-                    timeText=startTimeDisplay+"am - "+endTimeDisplay+"am";
-                }
-                else{
-                    timeText=startTimeDisplay+"pm - "+endTimeDisplay+"pm";
-                }
-                */
-                //startTimeDisplay=startTimeDisplay+gap;
-                //endTimeDisplay=startTimeDisplay+gap;
-
-                //timeContainerEle.innerHTML=i+"hrs";
-                timeContainerEle.innerHTML = timeText;
-                timeContainer.appendChild(timeContainerEle);
-                fr.appendChild(timeContainer);
             }
             return fr;
         };
@@ -720,43 +380,6 @@
         var changeCurrentMonth = function(id) {
             var d = new Date(parseInt(id));
             return months[d.getMonth()];
-        };
-
-        var createDuration = function(eid) {
-            var fr = document.createDocumentFragment();
-            var arr = eid.split("-");
-            var xx = arr[arr.length - 1].split("hrs");
-            var startTime = parseInt(xx[0]);
-            for (var i = startTime + 1; i <= 24; i++) {
-                var d = document.createElement("option");
-                d.setAttribute("value", i);
-                var ht = document.createTextNode(i);
-                d.appendChild(ht);
-                fr.appendChild(d);
-            }
-            return fr;
-        };
-
-        var calcTime = function(country) {
-            // console.log(country);
-            var tempi = 0;
-            for (var key in timeZoneCountries) {
-                if (timeZoneCountries[key] == country) {
-                    offset = parseFloat(timeZoneOffsets[tempi]);
-                    break;
-                } else {
-                    tempi++;
-                }
-            }
-
-            d = new Date();
-
-            var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-
-            var nd = new Date(utc + (3600000 * offset));
-
-
-            return Number(nd);
         };
 
         var bindForm = function(country) {
@@ -775,23 +398,22 @@
             var timeDisplayInstance = document.getElementById(timeDisplayId);
             var eventDisplayInstance = document.getElementById(eventDisplayId);
             var datesInstance = document.getElementById(datesId);
-            dd = calcTime("india");
 
             daysOfWeekInstance.innerHTML = "";
-
             daysOfWeekInstance.appendChild(createDaysOfWeeks());
+
             datesInstance.innerHTML = "";
-            datesInstance.appendChild(createDates2(currentUtcTime, setCountry));
-            currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
-            currentYearValue.innerHTML = changeCurrentYear(Number(dd));
+            datesInstance.appendChild(createDates(currentUtcTime, setCountry));
+            currentMonthValue.innerHTML = changeCurrentMonth(currentUtcTime);
+            currentYearValue.innerHTML = changeCurrentYear(currentUtcTime);
 
             timeDisplayInstance.innerHTML = "";;
-            timeDisplayInstance.appendChild(createTimeBoxes2(currentUtcTime, 6, setCountry));
+            timeDisplayInstance.appendChild(createTimeBoxes(currentUtcTime, 6, setCountry));
 
             eventDisplayInstance.innerHTML = "";
             for (var i = 0; i < 7; i++) {
                 var columnDate = document.getElementById("dates").children[i].innerHTML;
-                eventDisplayInstance.appendChild(createEventBoxesColumn2(currentUtcTime, columnDate, setCountry));
+                eventDisplayInstance.appendChild(createEventBoxesColumn(currentUtcTime, columnDate, setCountry));
             }
 
             addEvent('click', prevWeekButtonInstance, function(e) {
@@ -805,7 +427,6 @@
             });
 
             addEvent('click', prevMonthButtonInstance, function(e) {
-                // var da=new Date(dd);
                 var da = new Date(currentUtcTime);
                 var year = da.getFullYear();
                 var mon = da.getMonth();
@@ -815,15 +436,11 @@
                     mon = 11;
                 }
                 var ds = new Date(year, mon, 1);
-                console.log(ds);
-                // dd=Number(ds);
                 currentUtcTime = Number(ds);
-                // displayChange(dd);
                 displayChange(currentUtcTime);
             });
 
             addEvent('click', nextMonthButtonInstance, function(e) {
-                // var da=new Date(dd);
                 var da = new Date(currentUtcTime);
                 var year = da.getFullYear();
                 var mon = da.getMonth();
@@ -832,23 +449,20 @@
                     year = year + 1;
                 }
                 var ds = new Date(year, mon, 1);
-                // dd=Number(ds);
                 currentUtcTime = Number(ds);
-                // displayChange(dd);
                 displayChange(currentUtcTime);
             });
 
             function displayChange(dd) {
                 datesInstance.innerHTML = "";
-                // datesInstance.appendChild(createDates(dd));
-                datesInstance.appendChild(createDates2(dd, setCountry));
+                datesInstance.appendChild(createDates(dd, setCountry));
                 var newMonth = new Date(dd);
                 currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
                 currentYearValue.innerHTML = changeCurrentYear(Number(dd));
                 eventDisplayInstance.innerHTML = "";
                 for (var i = 0; i < 7; i++) {
                     var xxx = document.getElementById("dates").children[i].innerHTML;
-                    eventDisplayInstance.appendChild(createEventBoxesColumn2(currentUtcTime, xxx, setCountry));
+                    eventDisplayInstance.appendChild(createEventBoxesColumn(currentUtcTime, xxx, setCountry));
                 }
                 temp();
             }
@@ -867,13 +481,9 @@
                     var x = JSON.parse(localStorage.getItem("calenderEvents"));
                     var ij = 0;
                     for (var key in x.data) {
-                        // if(x.data[key].id==id1){
-                        // if(x.data[key].frTime==frTime){
                         if ((x.data[key].frTime >= adjustedFrTime && x.data[key].frTime < adjustedEdTime) || (x.data[key].edTime > adjustedFrTime && x.data[key].edTime <= adjustedEdTime)) {
-                            // if(x.data[key].frTime==adjustedFrTime){
                             if (x.data[key].frTime != adjustedFrTime) {
                                 if ((x.data[key].frTime > adjustedFrTime && x.data[key].frTime < adjustedEdTime)) {
-                                    console.log("if");
                                     tempFrTime = parseInt($("#" + e.target.id).attr("from-time")) + parseInt((60 * 60 * 1000));
                                     var x1 = "div[from-time='" + tempFrTime + "']";
                                     var tt = $(x1).children();
@@ -881,10 +491,7 @@
                                     $(tt[0]).attr("class", "blankTextOfEvent");
                                     $(tt[1]).remove();
                                     $(x1).attr("style", "background-image: url('images/plus2.jpg')");
-                                    // $(x1).html("");
-                                    // $(x1).attr("class","blankTextOfEvent");
                                 } else {
-                                    console.log("else");
                                     tempFrTime = parseInt($("#" + e.target.id).attr("from-time")) - parseInt((60 * 60 * 1000));
                                     var x1 = "div[from-time='" + tempFrTime + "']";
 
@@ -894,9 +501,6 @@
                                     $(tt[0]).attr("class", "blankTextOfEvent");
                                     $(tt[1]).remove();
                                     $(x1).attr("style", "background-image: url('images/plus2.jpg')");
-
-                                    // $(x1).html("");
-                                    // $(x1).attr("class","blankTextOfEvent");
                                 }
                             }
                             x.data.splice(ij, 1);
@@ -913,137 +517,6 @@
                 } else {}
             };
 
-            var handle4 = function(e) {
-                /*
-                var text=$("#"+e.target.id).text();
-                var tempOffset=0;
-                var id1=e.target.id;
-                var frTime=$("#"+id1).attr("from-Time");
-                    
-                var tempi=0;
-                for(var key in timeZoneCountries){
-                    if(timeZoneCountries[key]==setCountry){
-                        tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
-                        break;
-                    }
-                    else{
-                        tempi++;
-                    }
-                }
-                tempOffset=tempOffset*60*60*1000;
-                frTime=frTime-tempOffset;
-
-                var frTime1=$("#"+e.target.id).parent().attr("from-time")-tempOffset;
-                var edTime1=$("#"+e.target.id).parent().attr("end-time")-tempOffset;
-
-
-                $("#"+id1).css("background-image","url('images/plus2.jpg')");
-                var x=JSON.parse(localStorage.getItem("calenderEvents"));
-                var ij=0;
-                for(var key in x.data){                        
-                    if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
-                        if(x.data[key].frTime !=frTime1){
-                            if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
-                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )+parseInt((60*60*1000));
-                                var x1="div[from-time='"+tempFrTime+"']";
-                                var tt=$(x1).children();
-                                $(tt[0]).html(text);
-                            }
-                            else{
-                                tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )-parseInt((60*60*1000));
-                                var x1="div[from-time='"+tempFrTime+"']";
-                                var tt=$(x1).children();
-                                $(tt[0]).html(text);
-                            }
-                        }
-                        x.data[ij].value=text;
-                        localStorage.setItem("calenderEvents",JSON.stringify(x));
-                        break;
-                    }
-                    else{
-                        ij++;
-                    }
-                } 
-               
-                */
-
-
-                ///*
-                var text = $("#" + e.target.id).text();
-                var tempOffset = 0;
-                var id1 = e.target.id;
-                var frTime = $("#" + id1).parent().attr("from-Time");
-                // if(setCountry!="india"){
-                var tempi = 0;
-                for (var key in timeZoneCountries) {
-                    if (timeZoneCountries[key] == setCountry) {
-                        tempOffset = 5.5 - parseFloat(timeZoneOffsets[tempi]);
-                        break;
-                    } else {
-                        tempi++;
-                    }
-                }
-                tempOffset = tempOffset * 60 * 60 * 1000;
-                frTime = frTime - tempOffset;
-
-                var frTime1 = $("#" + e.target.id).parent().attr("from-time") - tempOffset;
-                var edTime1 = $("#" + e.target.id).parent().attr("end-time") - tempOffset;
-                var x = JSON.parse(localStorage.getItem("calenderEvents"));
-                var ij = 0;
-                for (var key in x.data) {
-                    // if(x.data[key].id==id1){
-                    // if(x.data[key].frTime==frTime){
-                    if ((x.data[key].frTime >= frTime1 && x.data[key].frTime < edTime1) || (x.data[key].edTime > frTime1 && x.data[key].edTime <= edTime1)) {
-
-                        if (x.data[key].frTime != frTime1) {
-
-                            if ((x.data[key].frTime > frTime1 && x.data[key].frTime < edTime1)) {
-                                tempFrTime = parseInt($("#" + e.target.id).parent().attr("from-time")) + parseInt((60 * 60 * 1000));
-                                var x1 = "div[from-time='" + tempFrTime + "']";
-                                var tempchild = $(x1).children();
-                                $(tempchild[0]).html(text);
-                                console.log("if");
-                            } else {
-                                tempFrTime = parseInt($("#" + e.target.id).parent().attr("from-time")) - parseInt((60 * 60 * 1000));
-                                var x1 = "div[from-time='" + tempFrTime + "']";
-                                var tempchild = $(x1).children();
-                                $(tempchild[0]).html(text);
-                                console.log("else");
-                            }
-                        }
-                        x.data[ij].value = text;
-                        localStorage.setItem("calenderEvents", JSON.stringify(x));
-                        // displayChange(dd);
-                        break;
-                    } else {
-                        ij++;
-                    }
-                }
-
-
-                //*/
-
-
-
-
-                // $("#"+id1).css("background-color","");
-                // displayChange(dd);   
-
-                /*
-                console.log("handle4");
-                var text=$("#"+e.target.id).text();
-                var x=JSON.parse(localStorage.getItem("calenderEvents"));
-                var ttt=e.target.id.split("te");
-                var id=ttt[1];
-                for(var key in x.data){
-                    if(x.data[key].id==id){
-                        x.data[key].value=text;
-                    }
-                }
-                localStorage.setItem("calenderEvents",JSON.stringify(x));
-                */
-            };
-
             var editEvent = function(e) {
                 var text = $("#" + e.target.id).text();
                 var frTime1 = $("#" + e.target.id).parent().attr("from-time");
@@ -1056,13 +529,11 @@
                     if ((x.data[key].frTime >= adjustedFrTime && x.data[key].frTime < adjustedEdTime) || (x.data[key].edTime > adjustedFrTime && x.data[key].edTime <= adjustedEdTime)) {
                         if (x.data[key].frTime != adjustedFrTime) {
                             if ((x.data[key].frTime > adjustedFrTime && x.data[key].frTime < adjustedEdTime)) {
-                                console.log("if");
                                 tempFrTime = parseInt($("#" + e.target.id).parent().attr("from-time")) + parseInt((60 * 60 * 1000));
                                 var x1 = "div[from-time='" + tempFrTime + "']";
                                 var tt = $(x1).children();
                                 $(tt[0]).html(text);
                             } else {
-                                console.log("else");
                                 tempFrTime = parseInt($("#" + e.target.id).parent().attr("from-time")) - parseInt((60 * 60 * 1000));
                                 var x1 = "div[from-time='" + tempFrTime + "']";
                                 var tt = $(x1).children();
@@ -1078,62 +549,7 @@
                 }
             }
 
-            var addNewEventpr = function(e) {
-                console.log("handle5");
-                var text = $("#" + e.target.id).text();
-                var id1 = e.target.id.split("te");
-                var id = id1[1];
-                if (text != "") {
-                    $("#" + id).css("background-image", "");
-                    var x = JSON.parse(localStorage.getItem("calenderEvents"));
-                    var endTime = "";
-
-                    var frTime = $("#" + id).attr("from-Time");
-                    var edTime = $("#" + id).attr("end-Time");
-
-                    // if(setCountry!="india"){
-                    var tempOffset;
-                    var tempi = 0;
-                    for (var key in timeZoneCountries) {
-                        if (timeZoneCountries[key] == setCountry) {
-                            tempOffset = 5.5 - parseFloat(timeZoneOffsets[tempi]);
-                            // console.log(tempOffset);
-                            break;
-                        } else {
-                            tempi++;
-                        }
-                    }
-
-                    tempOffset = tempOffset * 60 * 60 * 1000;
-                    console.log(tempOffset);
-
-
-                    frTime = frTime - tempOffset;
-                    edTime = edTime - tempOffset;
-                    // }
-
-                    var string = '{ "id":"' + id + '" , "value":"' + text + '" , "duration":"' + endTime + '" , "frTime":"' + frTime + '" , "edTime":"' + edTime + '"}';
-                    console.log(frTime + "-" + edTime);
-                    x.data.push(JSON.parse(string));
-                    localStorage.setItem("calenderEvents", JSON.stringify(x));
-
-                    document.getElementById(id).children[0].innerHTML = text;
-                    $("#" + id).css("background-image", "");
-                    $("#" + id).css("background-color", "LightSteelBlue");
-
-                    var sp = document.createElement("span");
-                    sp.innerHTML = "&#x2718;";
-                    sp.setAttribute("id", id);
-                    sp.setAttribute("class", "cross");
-                    $("#" + id).append(sp);
-                    $("#" + e.target.id).removeClass("blankTextOfEvent").addClass("textOfEvent");
-                } else {
-                    $("#" + id).css("background-color", "");
-                }
-            };
-
             var addNewEvent = function(e) {
-                console.log("addNewEvent");
                 var text = $("#" + e.target.id).text();
                 var id1 = e.target.id.split("te");
                 var id = id1[1];
@@ -1236,51 +652,7 @@
                 });
             })();
 
-            /*
-            function setIntervalData(gap){
-                boxesInOneColumn=(60*24)/gap;
-                totalBoxes=boxesInOneColumn*7;
-                intervalGap=boxesInOneColumn/24;
-            }
-            //setIntervalData(60);
-            function displayCases(caseNumber){
-                var startDisplay=6*(caseNumber);
-
-                for(i=0;i<totalBoxes;i++){
-                    var tt=$("#eventDisplay").children();
-                    if( i>=(startDisplay+(boxesInOneColumn*0)) && i<=(startDisplay+(boxesInOneColumn*0)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*1)) && i<=(startDisplay+(boxesInOneColumn*1)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*2)) && i<=(startDisplay+(boxesInOneColumn*2)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*3)) && i<=(startDisplay+(boxesInOneColumn*3)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*4)) && i<=(startDisplay+(boxesInOneColumn*4)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*5)) && i<=(startDisplay+(boxesInOneColumn*5)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else if( i>=(startDisplay+(boxesInOneColumn*6)) && i<=(startDisplay+(boxesInOneColumn*6)+5) ){
-                        $(tt[i]).removeClass("eventHide").addClass("eventShow");
-                    }
-                    else{
-                        $(tt[i]).removeClass("eventShow").addClass("eventHide");
-                    }
-                    $(".eventHide").hide();
-                    $(".eventShow").show();
-                }
-            }
-            //displayCases();
-            */
-
             function displayCases(caseNumber) {
-                var gap = 20;
                 var boxesInOneColumn = parseInt(1440 / gap);
                 var totalBoxes = parseInt(boxesInOneColumn * 7);
                 var startDisplay = 6 * (caseNumber);
@@ -1312,7 +684,6 @@
                     } else {
                         $(tt2[i]).removeClass("eventShow").addClass("eventHide");
                     }
-
                 }
             }
 
@@ -1324,7 +695,6 @@
 
             addEvent("click", moveDownButtonInstance, function() {
                 clickCount = clickCount + 1;
-                var gap = 20;
                 var numberOfSpans = ((1440 / gap) / 6);
                 if (clickCount >= numberOfSpans - 1) {
                     $("#moveDownButton").css("cursor", "not-allowed");
@@ -1356,7 +726,6 @@
             });
 
             function displaycasestemp(caseNumber) {
-                var gap = 20;
                 var boxesInOneColumn = parseInt(1440 / gap);
                 var totalBoxes = boxesInOneColumn * 7;
                 var startDisplay = 6 * (caseNumber);
