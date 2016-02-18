@@ -4,11 +4,15 @@
         var months=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
         var dates=[''];
         var dd;
+        var currentCountryDate=new Date();
+
+
         var setCountry=$("#changeCountry").val();
         // console.log(setCountry);
 
-        var timeZoneCountries=["america", "india" ,"pakistan","srilanka", "iran" ,"iraq"];
-        var timeZoneOffsets  =["+6"   , "-5.5"  ,"-5"     ,"-5.5"     , "-3.5" ,"-3"];
+        var timeZoneCountries=["america", "india" ,"pakistan","srilanka", "iran" ,"iraq","utc"];
+        // var timeZoneOffsets  =["+6"   , "-5.5"  ,"-5"     ,"-5.5"     , "-3.5" ,"-3"];
+        var timeZoneOffsets  =["-6"   , "+5.5"  ,"+5"     ,"+5.5"     , "+3.5" ,"+3.2", "0"];
 
         var nextWeekButtonId, prevWeekButtonid, daysOfWeekId, currentMonthId, datesId,timeDisplayId, eventDisplayId,currentYearId,moveUpButtonId,moveDownButtonId,nextMonthButtonId,prevMonthButtonId;
 
@@ -60,13 +64,52 @@
             eventDisplayId      = eventDisplayIdPar;
         };
 
+
+
+
+        var convertUtcToThis=function(time1,country){
+            var offset;
+            var j=0;
+            for(var key in timeZoneCountries){
+                if(timeZoneCountries[key]==country){
+                    offset=timeZoneOffsets[j];
+                }
+                else{
+                    j++;
+                }
+            }
+            return parseInt( parseInt(time1)+parseInt( (offset*3600000)) );
+        };
+
+        var convertThisToUtc=function(time,country){
+            var offset;
+            var j=0;
+            for(var key in timeZoneCountries){
+                if(timeZoneCountries[key]==country){
+                    offset=timeZoneOffsets[j];
+                }
+                else{
+                    j++;
+                }
+            }
+            return parseInt(time)-parseInt( (offset*3600000));
+        };
+
+        var getCurrentUtcTime=function(){
+            var x=new Date();
+            var y = parseInt( x.getTimezoneOffset() );
+            var ans=Number(x)+(60*y);
+            return ans;
+            // return x.getTime;
+        };
+
         var setLocalStorage=function(){
             if(localStorage.getItem("calenderEvents")){
             }
             else{
                 localStorage.setItem('calenderEvents','{"data":[]}');
             }
-        }
+        };
     
         var addEvent    =   function(evnt, elem, func) {
 
@@ -201,6 +244,89 @@
             return fr;
         };
 
+        var createDates2=function(dateNumber,setCountry){
+            var adjustedTime=convertUtcToThis(dateNumber,setCountry);
+
+            var d=new Date(adjustedTime);
+            var date=d.getDate();
+            var day=d.getDay();
+            var year=d.getFullYear();
+            var month=d.getMonth();
+
+            var todayDate=new Date();
+
+
+            var fr=document.createDocumentFragment();
+            if(date>=day){
+                var startDate=date-day+1;
+                var temp=0;
+                var st=startDate;
+                for(var i=0;i<7;i++){
+
+                    var dateContainer=document.createElement("div");
+                    dateContainer.className="dates";
+                    if(i==6){
+                        dateContainer.className="dates lastdate";
+                    }
+                    // dateContainer.setAttribute("id","");
+                    var textEle=document.createTextNode(startDate);
+                    dateContainer.appendChild(textEle);
+                    if(todayDate.getDate()==st && todayDate.getMonth()==month && todayDate.getFullYear()==year){
+                        dateContainer.setAttribute("style","font-weight:bold");
+                    }
+
+                    if(temp==0){
+                       //dateContainer.setAttribute("style","font-weight:bold"); 
+                    }
+                    else{
+                        dateContainer.setAttribute("style","opacity:0.6");
+                    }
+                    
+                    fr.appendChild(dateContainer);
+                    startDate++;
+                    var x2= new Date(year,month+1,0).getDate();
+                    if(startDate>x2){
+                        temp=1;
+                        dateContainer.setAttribute("style","opacity:0.6");
+                        startDate=1;
+                    }
+                    st++;
+                }                
+            }
+            else{
+                var difference=day-date;
+                var x2= new Date(year,month,0).getDate();
+                var startDate2=x2-difference+1;
+                for(var i=0;i<difference;i++){
+                     var dateContainer=document.createElement("div");
+                     dateContainer.className="dates";
+                        // dateContainer.setAttribute("id","");
+                     var textEle=document.createTextNode(startDate2);
+                     dateContainer.setAttribute("style","opacity:0.6");
+                     dateContainer.appendChild(textEle);
+                     fr.appendChild(dateContainer);
+                     startDate2++;
+                }
+                var startDate=1;
+                for(var i=0;i<7-difference;i++){
+                     var dateContainer=document.createElement("div");
+                     dateContainer.className="dates";
+
+                     if(i==(6-difference)){
+                        dateContainer.className="dates lastdate";
+                    }
+
+                     // dateContainer.setAttribute("id","");
+                     var textEle=document.createTextNode(startDate);
+                     dateContainer.appendChild(textEle);
+                     //dateContainer.setAttribute("style","font-weight:bold");
+                     fr.appendChild(dateContainer);
+                     startDate++;
+                }
+            }
+            return fr;
+        };
+
         var ifPresent=function(eid){
             var check=0;
             var x=JSON.parse(localStorage.getItem("calenderEvents"));
@@ -230,7 +356,24 @@
             }
             
             return check;
-        }
+        };
+
+        var setTimeAccToEvent=function(){
+
+        };
+
+        var ifPresentEvent=function(frTime,edTime){
+            var check=0;
+            var x=JSON.parse(localStorage.getItem("calenderEvents"));
+            for(var key in x.data){
+                var tempfr=convertUtcToThis(x.data[key].frTime,setCountry);
+                var temped=convertUtcToThis(x.data[key].edTime,setCountry);
+                if( (tempfr>=frTime && tempfr<edTime) || (temped>frTime && temped<edTime)    ){
+                    check=x.data[key].value;
+                }
+            }
+            return check;
+        };
 
         var createEventBoxesColumn=function(columnDate,country){
 
@@ -278,7 +421,132 @@
                 var value=ifPresentFromTime(frTime+tempOffset,edTime+tempOffset);
 
                 if(value){
-                    console.log(value);
+                    eventContainerEle.innerHTML =  value;
+                    eventContainerEle.setAttribute("class","textOfEvent");
+                    eventContainerEle.setAttribute("id","te"+eventId);
+
+                    sp=document.createElement("span");
+                    sp.innerHTML="&#x2718;";
+                    sp.setAttribute("class","cross");
+                    sp.setAttribute("id",eventId);
+                    checkPresence=1;
+
+                    eventContainer.setAttribute("style","background-color:LightSteelBlue");
+                }
+                else{
+                        eventContainer.setAttribute("style","background-image: url('images/plus2.jpg')");
+                        eventContainerEle.className="blankTextOfEvent";
+                        eventContainerEle.innerHTML =  "";
+                        eventContainerEle.setAttribute("id","te"+eventId);
+                }
+
+                    eventContainer.appendChild(eventContainerEle);
+                    if(checkPresence==1){
+                        eventContainer.appendChild(sp);
+                    }
+                    fr.appendChild(eventContainer);
+                }
+                return fr;
+        };
+
+        var createEventBoxesColumn2=function(dateNumber,columnDate,country){
+
+            var boxesInOneColumn=24;
+            var adjustedTime=convertUtcToThis(dateNumber,setCountry);
+            var d1=new Date(adjustedTime);
+            var year=d1.getFullYear();
+            var month=d1.getMonth();
+            // var currentCountryYear=currentCountryDate.getFullYear();
+            // var CurrentCountryMonth=currentCountryDate.getMonth();
+
+            // var tempDate = new Date(currentCountryYear, CurrentCountryMonth, columnDate);
+            var tempDate=new Date(year,month,columnDate);
+
+            var tempDateTime=Number(tempDate);
+            // console.log(tempDateTime);
+
+            tempDateTime=parseInt(convertUtcToThis(tempDateTime,setCountry));
+
+            var prevTempDateTime=tempDateTime;
+
+            while(1){
+
+                var c=new Date(tempDateTime);
+                var str=c.toString();
+                var strArr=str.split(" ");
+
+                var timeText=strArr[4];
+
+
+
+                var c3=new Date(prevTempDateTime);
+                var str3=c3.toString();
+                var strArr3=str3.split(" ");
+
+                var timeText3=strArr3[4];
+                
+                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
+                if( (parseInt(timeText)==23 && parseInt(timeText3)==0)  || (parseInt(timeText)==0 && parseInt(timeText3)==23)) {
+                    break;
+                }
+                // }
+
+
+                prevTempDateTime=tempDateTime;
+                
+                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
+                // // if(parseInt(timeText)<0){
+
+                //     break;
+                // }
+                // tempDateTime=parseInt(tempDateTime)-parseInt((gap*60*1000));
+                var tempi=0;
+                for(var key in timeZoneCountries){
+                    if(timeZoneCountries[key]==country){
+                        if(timeZoneOffsets[tempi]>0){
+                            tempDateTime=parseInt(tempDateTime)-3600000;
+                        }
+                        else{
+                            tempDateTime=parseInt(tempDateTime)+3600000;
+                        }
+                        break;
+                    }
+                    else{
+                        tempi++;
+                    }
+                
+                }
+            }
+            var gap=60;
+
+            var fr=document.createDocumentFragment();
+            for(var i=0;i<boxesInOneColumn;i++){
+                var checkPresence=0;
+                var sp; 
+                var spEdit;
+                var eventId=columnDate+"-"+month+"-"+year+"-"+i+"hrs";
+                var eventContainer          =  document.createElement('div');
+                                  
+                eventContainer.setAttribute("id",eventId);
+                eventContainer.className    =  'event';
+
+                var frTime=parseInt(tempDateTime);
+                var edTime=parseInt(tempDateTime)+(gap*60000);
+                tempDateTime=tempDateTime+(gap*60000);
+
+                //this frtime is according to the country
+                eventContainer.setAttribute("from-time",frTime);
+                eventContainer.setAttribute("end-time",edTime);
+
+                var eventContainerEle       =  document.createElement('strong');
+                eventContainerEle.setAttribute("contenteditable","true");
+
+                //var value=ifPresent(eventId);
+                // var value=ifPresentFromTime(frTime,edTime);
+
+                var value=ifPresentEvent(frTime,edTime);
+
+                if(value){
                     eventContainerEle.innerHTML =  value;
                     eventContainerEle.setAttribute("class","textOfEvent");
                     eventContainerEle.setAttribute("id","te"+eventId);
@@ -355,6 +623,96 @@
             return fr;
         };
 
+        var createTimeBoxes2=function(dateNumber,columnDate,country){
+            var boxesInOneColumn=24;
+            var adjustedTime=convertUtcToThis(dateNumber,setCountry);
+            var d1=new Date(adjustedTime);
+            var year=d1.getFullYear();
+            var month=d1.getMonth();
+            var gap=60;
+
+            var tempDate=new Date(year,month,columnDate);
+
+            var tempDateTime=Number(tempDate);
+
+            tempDateTime=parseInt(convertUtcToThis(tempDateTime,setCountry));
+
+            var prevTempDateTime=tempDateTime;
+            // var c=new Date(tempDateTime);
+
+            while(1){
+                var c=new Date(tempDateTime);
+                var str=c.toString();
+                var strArr=str.split(" ");
+
+                var timeText=strArr[4];
+
+
+
+                var c3=new Date(prevTempDateTime);
+                var str3=c3.toString();
+                var strArr3=str3.split(" ");
+
+                var timeText3=strArr3[4];
+                
+                // if(parseInt(timeText)>=0 && parseInt(timeText)<1 ){
+                if( (parseInt(timeText)==23 && parseInt(timeText3)==0)  || (parseInt(timeText)==0 && parseInt(timeText3)==23)) {
+                    break;
+                }
+                // }
+
+
+                prevTempDateTime=tempDateTime;
+
+                var tempi=0;
+                for(var key in timeZoneCountries){
+                    if(timeZoneCountries[key]==country){
+                        if(timeZoneOffsets[tempi]>0){
+                            tempDateTime=parseInt(tempDateTime)-(gap*60*1000);
+                            break;
+                        }
+                        else{
+                            tempDateTime=parseInt(tempDateTime)+(gap*60*1000);
+                            break;
+                        }
+                    }
+                tempi++;
+                }
+            }
+
+            var fr=document.createDocumentFragment();
+            for(var i=0;i<24;i++){
+                var c=new Date(tempDateTime);
+                var timeContainer=document.createElement("div");
+                timeContainer.className="time";
+                var id1="time"+i;
+                timeContainer.setAttribute("id",id1);
+                var timeContainerEle=document.createElement("strong");
+                var str=c.toString();
+                var strArr=str.split(" ");
+
+                var timeText=strArr[4];
+
+                var c1=new Date(tempDateTime+3600000);
+                var str1=c1.toString();
+                var strArr1=str1.split(" ");
+                timeText=timeText+"-"+strArr1[4];
+
+
+                // timeText=;
+
+
+                timeContainerEle.innerHTML=timeText;
+                timeContainer.appendChild(timeContainerEle);
+                fr.appendChild(timeContainer);
+                tempDateTime=parseInt(tempDateTime)+(gap*60000);
+
+
+            }
+
+            return fr;
+        };
+
         var getTimeDisplay=function(){
 
             var fr=document.createDocumentFragment();
@@ -396,7 +754,6 @@
                     st2=st2+gap;
                 }
                 else{
-                    // if()
                 }
                 
 
@@ -477,11 +834,11 @@
 
 
             return Number(nd);
-        }
-        //calcTime("california",12*60);
-       
+        };
+               
 
         var bindForm    =   function(country){
+            var currentUtcTime=getCurrentUtcTime();
             setCountry=country;
 
             var prevWeekButtonInstance   =   document.getElementById(prevWeekButtonId);
@@ -496,41 +853,34 @@
             var timeDisplayInstance      =   document.getElementById(timeDisplayId);
             var eventDisplayInstance     =   document.getElementById(eventDisplayId);
             var datesInstance            =   document.getElementById(datesId);
-
-            // var dd=new Date();
             dd=calcTime("india");
 
             daysOfWeekInstance.innerHTML="";
 
             daysOfWeekInstance.appendChild(createDaysOfWeeks());
-            // datesInstance.insertBefore(createDates(Number(dd)),datesInstance.childNodes[0]);
             datesInstance.innerHTML="";
-            datesInstance.appendChild(createDates(Number(dd)));
+            datesInstance.appendChild(createDates2(currentUtcTime,setCountry));
             currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
             currentYearValue.innerHTML=changeCurrentYear(Number(dd));
-            //passing interval as a argument in function to create time boxes
-            timeDisplayInstance.innerHTML="";;
-            timeDisplayInstance.appendChild(createTimeBoxes(60));
 
+            timeDisplayInstance.innerHTML="";;
+            timeDisplayInstance.appendChild(createTimeBoxes2(currentUtcTime,6,setCountry));
 
             eventDisplayInstance.innerHTML="";
             for(var i=0;i<7;i++){
                 var columnDate=document.getElementById("dates").children[i].innerHTML;
-                // eventDisplayInstance.insertBefore(createEventBoxesColumn(columnDate),eventDisplayInstance.childNodes[0]);
-                eventDisplayInstance.appendChild(createEventBoxesColumn(columnDate,setCountry));
+                eventDisplayInstance.appendChild(createEventBoxesColumn2(currentUtcTime,columnDate,setCountry));
             }
 
             addEvent('click',prevWeekButtonInstance,function(e){
-               datesInstance.innerHTML="";
-               datesInstance.appendChild(createDates(Number(dd)-604800000));
-               dd=Number(dd)-604800000;
-               displayChange(dd);
+               currentUtcTime=currentUtcTime-604800000;
+               displayChange(currentUtcTime);
+
             }); 
 
             addEvent('click',nextWeekButtonInstance,function(e){
-               datesInstance.innerHTML="";
-               dd=Number(dd)+604800000;
-               displayChange(dd);
+               currentUtcTime=currentUtcTime+604800000;
+               displayChange(currentUtcTime);
             });
 
             addEvent('click',prevMonthButtonInstance,function(e){
@@ -561,9 +911,9 @@
             });
 
             function displayChange(dd){
-                console.log("dis");
                 datesInstance.innerHTML="";
-                datesInstance.appendChild(createDates(dd));
+                // datesInstance.appendChild(createDates(dd));
+                datesInstance.appendChild(createDates2(dd,setCountry));
 
                 var newMonth=new Date(dd);
                 currentMonthValue.innerHTML = changeCurrentMonth(Number(dd));
@@ -571,45 +921,23 @@
                 eventDisplayInstance.innerHTML="";
                 for(var i=0;i<7;i++){
                 var xxx=document.getElementById("dates").children[i].innerHTML;
-                eventDisplayInstance.appendChild(createEventBoxesColumn(xxx,setCountry));
+                eventDisplayInstance.appendChild(createEventBoxesColumn2(currentUtcTime,xxx,setCountry));
                 }
 
                 temp();
             }
 
-            var handle2=function(e){
-                console.log("handle2");
+            var deleteEvent=function(e){
                 var r=confirm("Are you sure you want to delete");
                 var tempOffset=0;
                 if(r==true){
                     var id1=e.target.id;
-                    // console.log(id1);
-                    var frTime=$("#"+id1).attr("from-Time");
-                    console.log(frTime);
+                    
 
-                    //if(setCountry!="india"){
-                        
-                        var tempi=0;
-                        for(var key in timeZoneCountries){
-                            if(timeZoneCountries[key]==setCountry){
-                                tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
-                                // console.log(tempOffset);
-                                break;
-                            }
-                            else{
-                                tempi++;
-                            }
-                        }
-
-                        tempOffset=tempOffset*60*60*1000;
-                        console.log(tempOffset);
-
-
-                        frTime=frTime-tempOffset;
-                    //}
-
-                    var frTime1=$("#"+e.target.id).attr("from-time")-tempOffset;
-                var edTime1=$("#"+e.target.id).attr("end-time")-tempOffset;
+                    var frTime1=$("#"+e.target.id).attr("from-time");
+                    var adjustedFrTime=convertThisToUtc(frTime1,setCountry);
+                    var edTime1=$("#"+e.target.id).attr("end-time");
+                    var adjustedEdTime=convertThisToUtc(edTime1,setCountry);
 
 
                     $("#"+id1).css("background-image","url('images/plus2.jpg')");
@@ -618,13 +946,14 @@
                     for(var key in x.data){                        
                         // if(x.data[key].id==id1){
                         // if(x.data[key].frTime==frTime){
-                            if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+                            if( (x.data[key].frTime>=adjustedFrTime && x.data[key].frTime<adjustedEdTime) || (x.data[key].edTime>adjustedFrTime && x.data[key].edTime<=adjustedEdTime)){
 
+                            // if(x.data[key].frTime==adjustedFrTime){
 
+                                if(x.data[key].frTime !=adjustedFrTime){
 
-                                if(x.data[key].frTime !=frTime1){
-
-                                    if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
+                                    if((x.data[key].frTime>adjustedFrTime && x.data[key].frTime<adjustedEdTime) ){
+                                        console.log("if");
                                         tempFrTime=parseInt($("#"+e.target.id).attr("from-time") )+parseInt((60*60*1000));
                                         var x1="div[from-time='"+tempFrTime+"']";
 
@@ -640,6 +969,7 @@
                                         // $(x1).attr("class","blankTextOfEvent");
                                     }
                                     else{
+                                        console.log("else");
                                         tempFrTime=parseInt($("#"+e.target.id).attr("from-time") )-parseInt((60*60*1000));
                                         var x1="div[from-time='"+tempFrTime+"']";
 
@@ -755,6 +1085,7 @@
                     // if(x.data[key].id==id1){
                     // if(x.data[key].frTime==frTime){
                     if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+
                         if(x.data[key].frTime !=frTime1){
 
                             if((x.data[key].frTime>frTime1 && x.data[key].frTime<edTime1) ){
@@ -806,7 +1137,46 @@
                 */
             };
 
-            var handle5=function(e){
+            var editEvent=function(e){
+                var text=$("#"+e.target.id).text();
+                    var frTime1=$("#"+e.target.id).parent().attr("from-time");
+                    var adjustedFrTime=convertThisToUtc(frTime1,setCountry);
+                    var edTime1=$("#"+e.target.id).parent().attr("end-time");
+                    var adjustedEdTime=convertThisToUtc(edTime1,setCountry);
+
+                    var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                    var ij=0;
+                    for(var key in x.data){                        
+                            if( (x.data[key].frTime>=adjustedFrTime && x.data[key].frTime<adjustedEdTime) || (x.data[key].edTime>adjustedFrTime && x.data[key].edTime<=adjustedEdTime)){
+                                if(x.data[key].frTime !=adjustedFrTime){
+
+                                    if((x.data[key].frTime>adjustedFrTime && x.data[key].frTime<adjustedEdTime) ){
+                                        console.log("if");
+                                        tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )+parseInt((60*60*1000));
+                                        var x1="div[from-time='"+tempFrTime+"']";
+                                        var tt=$(x1).children();
+                                        $(tt[0]).html(text);
+                                    }
+                                    else{
+                                        console.log("else");
+                                        tempFrTime=parseInt($("#"+e.target.id).parent().attr("from-time") )-parseInt((60*60*1000));
+                                        var x1="div[from-time='"+tempFrTime+"']";
+                                        var tt=$(x1).children();
+                                        $(tt[0]).html(text);
+                                    }
+                                }
+                                x.data[key].value=text;
+
+                                localStorage.setItem("calenderEvents",JSON.stringify(x));
+                                break;
+                            }
+                            else{
+                                ij++;
+                            }
+                    }    
+            }
+
+            var addNewEventpr=function(e){
                 console.log("handle5");
                 var text=$("#"+e.target.id).text();
                 var id1=e.target.id.split("te");
@@ -862,41 +1232,71 @@
                 }
             };
 
-            var handle6=function(e){
+            var addNewEvent=function(e){
+                console.log("addNewEvent");
+                var text=$("#"+e.target.id).text();
+                var id1=e.target.id.split("te");
+                var id=id1[1];
 
-                var tempi=0;
-                    for(var key in timeZoneCountries){
-                        if(timeZoneCountries[key]==setCountry){
-                            tempOffset=5.5-parseFloat(timeZoneOffsets[tempi]);
-                            break;
-                        }
-                        else{
-                            tempi++;
-                        }
-                    }
-                var tempOffset=tempOffset*60*60*1000;
+                if(text != ""){
+                    $("#"+id).css("background-image","");
+                    var x=JSON.parse(localStorage.getItem("calenderEvents"));
+                    var endTime="";
 
+                    var frTime=$("#"+id).attr("from-Time");
+                    var edTime=$("#"+id).attr("end-Time");
+                    var adjustedFrTime=convertThisToUtc(frTime,setCountry);
+                    var adjustedEdTime=convertThisToUtc(edTime,setCountry);
 
+                    var string='{ "id":"'+id+'" , "value":"'+text+'" , "duration":"'+endTime+'" , "frTime":"'+adjustedFrTime+'" , "edTime":"'+adjustedEdTime+'"}';
+                    x.data.push(JSON.parse(string));
+                    localStorage.setItem("calenderEvents",JSON.stringify(x));
 
-                // console.log("handle6");
-                var frTime1=$("#"+e.target.id).parent().attr("from-time")-tempOffset;
-                var edTime1=$("#"+e.target.id).parent().attr("end-time")-tempOffset;
+                    document.getElementById(id).children[0].innerHTML = text;
+                    $("#"+id).css("background-image","");
+                    $("#"+id).css("background-color","LightSteelBlue");
+
+                    var sp=document.createElement("span");
+                    sp.innerHTML="&#x2718;";
+                    sp.setAttribute("id",id);
+                    sp.setAttribute("class","cross");
+                    $("#"+id).append(sp);
+                    $("#"+e.target.id).removeClass("blankTextOfEvent").addClass("textOfEvent");
+                }
+                else{
+                    $("#"+id).css("background-color","");
+                }
+            };
+
+            var showEventTime=function(e){
+
+                var frTime1=$("#"+e.target.id).parent().attr("from-time");
+                
+                var edTime1=$("#"+e.target.id).parent().attr("end-time");
+                
                 var x=JSON.parse(localStorage.getItem("calenderEvents"));
                 
                 for(var key in x.data){
-                    if( (x.data[key].frTime>=frTime1 && x.data[key].frTime<edTime1) || (x.data[key].edTime>frTime1 && x.data[key].edTime<=edTime1)){
+                    var adjustedFrTime=convertUtcToThis(x.data[key].frTime,setCountry);
+                    var adjustedEdTime=convertUtcToThis(x.data[key].edTime,setCountry);
+                    if( (adjustedFrTime>=frTime1 && adjustedFrTime<edTime1) || (adjustedEdTime>frTime1 && adjustedEdTime<=edTime1)){
 
-                        var datt1=parseInt(x.data[key].frTime)+parseInt(tempOffset);
+                        var datt1=parseInt(adjustedFrTime);
                         var dat1=new Date(parseInt(datt1));
                         var hours1=dat1.getHours();
+                        if(hours1>12){
+                            hours1=hours1-12;
+                        }
                         var min1=dat1.getMinutes();
 
-                        var datt2=parseInt(x.data[key].edTime)+parseInt(tempOffset);
+                        var datt2=parseInt(adjustedEdTime);
                         var dat2=new Date(parseInt(datt2));
-
-                        // var dat2=new Date(parseInt(x.data[key].edTime));
                         var hours2=dat2.getHours();
+                        if(hours2>12){
+                            hours2=hours2-12;
+                        }
                         var min2=dat2.getMinutes();
+
                         var ans=hours1+":"+min1+"-"+hours2+":"+min2;
                         $("#currEvent1").show();
                         $("#currEvent2").show();
@@ -907,17 +1307,18 @@
                 }
             };
 
-            var handle7=function(e){
+            var hideEventTime=function(e){
                  $("#currEvent1").hide();
                         $("#currEvent2").hide();
                         $("#currEvent2").html("");
             };
 
-            $('#'+eventDisplayId).off().on('click','.cross',handle2);
-            $('#'+eventDisplayId).on('blur' ,'.textOfEvent',handle4);
-            $("#"+eventDisplayId).on('blur','.blankTextOfEvent',handle5);
-            $("#"+eventDisplayId).on('mouseenter','.textOfEvent',handle6);
-            $("#"+eventDisplayId).on('mouseleave','.textOfEvent',handle7);
+            $('#'+eventDisplayId).off().on('click','.cross',deleteEvent);
+            $('#'+eventDisplayId).on('blur' ,'.textOfEvent',editEvent);
+            
+            $("#"+eventDisplayId).on('blur','.blankTextOfEvent',addNewEvent);
+            $("#"+eventDisplayId).on('mouseenter','.textOfEvent',showEventTime);
+            $("#"+eventDisplayId).on('mouseleave','.textOfEvent',hideEventTime);
 
             (function (){
                 $("#nextWeekButton").mouseenter(function(){
@@ -1122,20 +1523,13 @@
             }
 
             function temp(){
-                var tempi=0;
-                for(var key in timeZoneCountries){
-                    if(timeZoneCountries[key]==country){
-                        tempOffset=parseFloat(timeZoneOffsets[tempi]) - 5.5;
-                        break;
-                    }
-                    else{
-                        tempi++;
-                    }
-                }
-                var tempOffset=tempOffset*60*60*1000;
+               var x=currentUtcTime;
+               // var y=convertUtcToThis(x,setCountry);
 
-                var tempdd=dd-tempOffset;
+
+                var tempdd=x;
                 var tttt=new Date(tempdd);
+                console.log(tempdd);
                 var temphour=tttt.getHours();
                 if(temphour>=0 && temphour<6){
                     // console.log("case0");
